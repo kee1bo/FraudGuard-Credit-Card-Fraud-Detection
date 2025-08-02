@@ -1,0 +1,54 @@
+{
+  "model_name": "CatBoost",
+  "is_trained": true,
+  "training_config": {},
+  "metrics": {
+    "accuracy": 0.9996666666666667,
+    "precision": 1.0,
+    "recall": 0.9966666666666667,
+    "f1_score": 0.9983305509181971,
+    "confusion_matrix": [
+      [
+        2700,
+        0
+      ],
+      [
+        1,
+        299
+      ]
+    ],
+    "classification_report": {
+      "0": {
+        "precision": 0.9996297667530544,
+        "recall": 1.0,
+        "f1-score": 0.999814849102018,
+        "support": 2700.0
+      },
+      "1": {
+        "precision": 1.0,
+        "recall": 0.9966666666666667,
+        "f1-score": 0.9983305509181971,
+        "support": 300.0
+      },
+      "accuracy": 0.9996666666666667,
+      "macro avg": {
+        "precision": 0.9998148833765272,
+        "recall": 0.9983333333333333,
+        "f1-score": 0.9990727000101076,
+        "support": 3000.0
+      },
+      "weighted avg": {
+        "precision": 0.999666790077749,
+        "recall": 0.9996666666666667,
+        "f1-score": 0.9996664192836359,
+        "support": 3000.0
+      }
+    },
+    "roc_auc_score": 1.0,
+    "average_precision": 1.0,
+    "model_name": "catboost",
+    "test_set_size": 3000,
+    "fraud_rate": 0.1,
+    "prediction_rate": 0.09966666666666667
+  }
+}

@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction Results - FraudGuard AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Prediction Summary -->
+            <div class="card shadow mb-4 border-0">
+                <div class="card-header {% if result.prediction == 1 %}bg-danger{% else %}bg-success{% endif %} text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="mb-0">
+                                <i class="fas {% if result.prediction == 1 %}fa-exclamation-triangle{% else %}fa-check-circle{% endif %}"></i>
+                                Prediction Result: 
+                                {% if result.prediction == 1 %}
+                                    <span class="badge bg-light text-danger fs-6">FRAUDULENT TRANSACTION</span>
+                                {% else %}
+                                    <span class="badge bg-light text-success fs-6">LEGITIMATE TRANSACTION</span>
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <small>Model: {{ result.model_used.replace('_', ' ').title() }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <div class="risk-score-circle {% if result.risk_score > 50 %}high-risk{% else %}low-risk{% endif %} mb-2">
+                                    {{ "%.1f"|format(result.risk_score) }}%
+                                </div>
+                                <small class="text-muted fw-bold">Risk Score</small>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="metric-item mb-3">
+                                        <label class="metric-label">Fraud Probability:</label>
+                                        <div class="metric-value">
+                                            {{ "%.4f"|format(result.probability_fraud) }}
+                                            <div class="progress mt-1">
+                                                <div class="progress-bar bg-danger" style="width: {{ (result.probability_fraud * 100)|round(1) }}%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <label class="metric-label">Normal Probability:</label>
+                                        <div class="metric-value">
+                                            {{ "%.4f"|format(result.probability_normal) }}
+                                            <div class="progress mt-1">
+                                                <div class="progress-bar bg-success" style="width: {{ (result.probability_normal * 100)|round(1) }}%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="transaction-summary">
+                                        <h6><i class="fas fa-credit-card"></i> Transaction Summary</h6>
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td><strong>Amount:</strong></td>
+                                                <td>${{ "%.2f"|format(result.transaction_data.Amount) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Time:</strong></td>
+                                                <td>{{ result.transaction_data.Time }} seconds</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Model:</strong></td>
+                                                <td>{{ result.model_used.replace('_', ' ').title() }}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Explanation Section -->
+            {% if result.explanation %}
+            <div class="card shadow mb-4 border-0">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-brain"></i> AI Explanation</h5>
+                    <small>Understanding how the model made its decision</small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- SHAP Waterfall Plot -->
+                        <div class="col-lg-8">
+                            <h6><i class="fas fa-chart-waterfall"></i> Feature Contribution Analysis</h6>
+                            <div class="explanation-plot-container">
+                                {% if result.waterfall_plot %}
+                                    <img src="data:image/png;base64,{{ result.waterfall_plot }}" 
+                                         class="img-fluid rounded" alt="SHAP Waterfall Plot">
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Explanation plot not available for this model
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Feature Impact Table -->
+                        <div class="col-lg-4">
+                            <h6><i class="fas fa-list"></i> Top Contributing Features</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Feature</th>
+                                            <th>Value</th>
+                                            <th>Impact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="featureImpactTable">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Explanation Text -->
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-lightbulb"></i> How to interpret this explanation:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="mb-0">
+                                        <li><span class="badge bg-danger">Red bars</span> push prediction towards <strong>fraud</strong></li>
+                                        <li><span class="badge bg-primary">Blue bars</span> push prediction towards <strong>legitimate</strong></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="mb-0">
+                                        <li>Bar length shows the <strong>impact strength</strong></li>
+                                        <li>Final prediction = base value + all contributions</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Detailed Transaction Analysis -->
+            <div class="card shadow mb-4 border-0">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-list-alt"></i> Detailed Transaction Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Basic Features -->
+                        <div class="col-md-6">
+                            <h6>Basic Features</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Time:</strong></td>
+                                    <td>{{ result.transaction_data.Time }} seconds</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Amount:</strong></td>
+                                    <td>${{ "%.2f"|format(result.transaction_data.Amount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Hour of Day:</strong></td>
+                                    <td>{{ ((result.transaction_data.Time / 3600) % 24)|round(1) }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <!-- Risk Factors -->
+                        <div class="col-md-6">
+                            <h6>Risk Assessment</h6>
+                            <div class="risk-factors">
+                                {% set amount = result.transaction_data.Amount %}
+                                {% if amount > 1000 %}
+                                    <div class="alert alert-warning alert-sm">
+                                        <i class="fas fa-exclamation-triangle"></i> High amount transaction (>${{ "%.0f"|format(amount) }})
+                                    </div>
+                                {% endif %}
+                                {% set hour = (result.transaction_data.Time / 3600) % 24 %}
+                                {% if hour < 6 or hour > 22 %}
+                                    <div class="alert alert-warning alert-sm">
+                                        <i class="fas fa-moon"></i> Unusual time ({{ "%.1f"|format(hour) }}:00)
+                                    </div>
+                                {% endif %}
+                                {% if result.risk_score > 80 %}
+                                    <div class="alert alert-danger alert-sm">
+                                        <i class="fas fa-exclamation-triangle"></i> Very high risk score
+                                    </div>
+                                {% elif result.risk_score < 20 %}
+                                    <div class="alert alert-success alert-sm">
+                                        <i class="fas fa-check"></i> Very low risk score
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- PCA Features (expandable) -->
+                    <div class="mt-3">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#pcaFeaturesDetail">
+                            <i class="fas fa-chart-area"></i> Show PCA Features (V1-V28)
+                        </button>
+                        <div class="collapse mt-3" id="pcaFeaturesDetail">
+                            <div class="row">
+                                {% for key, value in result.transaction_data.items() %}
+                                    {% if key.startswith('V') %}
+                                        <div class="col-md-3 col-sm-6 mb-2">
+                                            <small><strong>{{ key }}:</strong> {{ "%.4f"|format(value) }}</small>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mb-4">
+                <a href="{{ url_for('prediction.predict') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-plus"></i> Analyze Another Transaction
+                </a>
+                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-primary btn-lg me-3">
+                    <i class="fas fa-chart-bar"></i> View Model Dashboard
+                </a>
+                <button class="btn btn-outline-secondary btn-lg" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print Results
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Process SHAP values for feature importance table (FIXED: tojson instead of tojsonfilter)
+{% if result.explanation %}
+try {
+    const shapValues = {{ result.explanation.shap_values | tojson if result.explanation.shap_values else '[]' }};
+    const featureNames = {{ result.explanation.feature_names | tojson if result.explanation.feature_names else '[]' }};
+    const instanceValues = {{ result.explanation.instance_values | tojson if result.explanation.instance_values else '[]' }};
+
+    if (shapValues.length > 0 && featureNames.length > 0 && instanceValues.length > 0) {
+        // Create feature impact data
+        const featureImpacts = featureNames.map((name, index) => ({
+            name: name,
+            value: instanceValues[index] || 0,
+            impact: shapValues[index] || 0,
+            absImpact: Math.abs(shapValues[index] || 0)
+        }));
+
+        // Sort by absolute impact and take top 10
+        featureImpacts.sort((a, b) => b.absImpact - a.absImpact);
+        const topFeatures = featureImpacts.slice(0, 10);
+
+        // Populate table
+        const tableBody = document.getElementById('featureImpactTable');
+        if (tableBody) {
+            topFeatures.forEach(feature => {
+                const row = tableBody.insertRow();
+                const impactClass = feature.impact > 0 ? 'text-danger' : 'text-primary';
+                const impactIcon = feature.impact > 0 ? '↑' : '↓';
+                
+                row.innerHTML = `
+                    <td><small><strong>${feature.name}</strong></small></td>
+                    <td><small>${feature.value.toFixed(4)}</small></td>
+                    <td class="${impactClass}">
+                        <small><strong>${impactIcon} ${feature.impact.toFixed(4)}</strong></small>
+                    </td>
+                `;
+            });
+        }
+    } else {
+        // Add a message if no explanation data
+        const tableBody = document.getElementById('featureImpactTable');
+        if (tableBody) {
+            tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No explanation data available</td></tr>';
+        }
+    }
+} catch (error) {
+    console.error('Error processing explanation data:', error);
+    const tableBody = document.getElementById('featureImpactTable');
+    if (tableBody) {
+        tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Error loading explanation data</td></tr>';
+    }
+}
+{% else %}
+// No explanation available
+const tableBody = document.getElementById('featureImpactTable');
+if (tableBody) {
+    tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No explanation available for this model</td></tr>';
+}
+{% endif %}
+
+// Add smooth scrolling for better UX
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll to results smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Add animation to risk score circle
+    const riskCircle = document.querySelector('.risk-score-circle');
+    if (riskCircle) {
+        riskCircle.style.transform = 'scale(0)';
+        setTimeout(() => {
+            riskCircle.style.transition = 'transform 0.5s ease-out';
+            riskCircle.style.transform = 'scale(1)';
+        }, 300);
+    }
+});
+</script>
+{% endblock %}

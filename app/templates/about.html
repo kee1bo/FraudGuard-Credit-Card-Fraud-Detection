@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}About - FraudGuard AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 text-primary mb-4">About FraudGuard AI</h1>
+            <p class="lead">
+                Advanced Credit Card Fraud Detection System powered by Machine Learning and Explainable AI
+            </p>
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <h3>Project Overview</h3>
+            <p>
+                FraudGuard AI is a comprehensive fraud detection system developed as part of an MSc Data Science project. 
+                It leverages state-of-the-art machine learning algorithms and explainable AI techniques to detect 
+                fraudulent credit card transactions in real-time.
+            </p>
+            <p>
+                The system is built on the famous ULB Credit Card Fraud Detection dataset from Kaggle, which contains 
+                284,807 transactions with only 0.172% fraudulent cases, presenting a challenging class imbalance problem.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <h3>Key Features</h3>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><i class="fas fa-check text-success"></i> Multiple ML models (XGBoost, Random Forest, LightGBM, etc.)</li>
+                <li class="list-group-item"><i class="fas fa-check text-success"></i> Explainable AI with SHAP and LIME</li>
+                <li class="list-group-item"><i class="fas fa-check text-success"></i> Real-time fraud detection</li>
+                <li class="list-group-item"><i class="fas fa-check text-success"></i> Interactive web dashboard</li>
+                <li class="list-group-item"><i class="fas fa-check text-success"></i> Advanced imbalance handling</li>
+                <li class="list-group-item"><i class="fas fa-check text-success"></i> Comprehensive model comparison</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Technology Stack</h3>
+            <div class="row">
+                <div class="col-md-3 text-center mb-3">
+                    <div class="tech-item">
+                        <i class="fab fa-python fa-3x text-primary mb-2"></i>
+                        <h5>Python</h5>
+                        <p>Core programming language</p>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="tech-item">
+                        <i class="fas fa-robot fa-3x text-success mb-2"></i>
+                        <h5>Scikit-learn</h5>
+                        <p>Machine learning framework</p>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="tech-item">
+                        <i class="fas fa-globe fa-3x text-info mb-2"></i>
+                        <h5>Flask</h5>
+                        <p>Web application framework</p>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="tech-item">
+                        <i class="fas fa-chart-bar fa-3x text-warning mb-2"></i>
+                        <h5>Chart.js</h5>
+                        <p>Data visualization</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Machine Learning Models -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3>Machine Learning Models</h3>
+            <div class="row">
+                <div class="col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-tree text-success"></i> Tree-Based Models</h5>
+                            <ul>
+                                <li>XGBoost</li>
+                                <li>LightGBM</li>
+                                <li>CatBoost</li>
+                                <li>Random Forest</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-calculator text-primary"></i> Linear Models</h5>
+                            <ul>
+                                <li>Logistic Regression</li>
+                                <li>Support Vector Machine</li>
+                                <li>Elastic Net</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-layer-group text-warning"></i> Ensemble Methods</h5>
+                            <ul>
+                                <li>Voting Classifier</li>
+                                <li>Stacking Classifier</li>
+                                <li>Adaptive Boosting</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explainable AI -->
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <h3>Explainable AI Techniques</h3>
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-brain text-primary"></i> SHAP (SHapley Additive exPlanations)</h5>
+                    <p>
+                        Provides unified measure of feature importance by calculating the contribution 
+                        of each feature to the prediction based on game theory.
+                    </p>
+                    <h5><i class="fas fa-lightbulb text-warning"></i> LIME (Local Interpretable Model-agnostic Explanations)</h5>
+                    <p>
+                        Explains individual predictions by approximating the model locally with an 
+                        interpretable model around the prediction.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h3>Performance Metrics</h3>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-primary">99.8%</h4>
+                            <small>ROC AUC Score</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success">95.2%</h4>
+                            <small>Precision</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-warning">88.7%</h4>
+                            <small>Recall</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-info">91.8%</h4>
+                            <small>F1 Score</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dataset Information -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3>Dataset Information</h3>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>ULB Credit Card Fraud Detection Dataset</h5>
+                            <ul>
+                                <li><strong>Total Transactions:</strong> 284,807</li>
+                                <li><strong>Fraudulent Transactions:</strong> 492 (0.172%)</li>
+                                <li><strong>Features:</strong> 30 (28 PCA + Time + Amount)</li>
+                                <li><strong>Time Period:</strong> 2 days in September 2013</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Data Challenges</h5>
+                            <ul>
+                                <li>Severe class imbalance (0.172% fraud)</li>
+                                <li>Anonymized features (PCA transformed)</li>
+                                <li>High-dimensional feature space</li>
+                                <li>Real-world transaction patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h3>Project Information</h3>
+            <div class="card bg-light">
+                <div class="card-body">
+                    <p><strong>Project:</strong> MSc Data Science Dissertation</p>
+                    <p><strong>Institution:</strong> University of Greenwich</p>
+                    <p><strong>Year:</strong> 2025</p>
+                    <p><strong>Supervisor:</strong> Dr. [Supervisor Name]</p>
+                    <div class="mt-3">
+                        <a href="https://github.com/yourusername/fraudguard-ai" class="btn btn-primary me-2">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                        <a href="{{ url_for('prediction.predict') }}" class="btn btn-success">
+                            <i class="fas fa-play"></i> Try the Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

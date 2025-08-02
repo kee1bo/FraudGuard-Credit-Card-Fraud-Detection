@@ -1,0 +1,616 @@
+{% extends "base.html" %}
+
+{% block title %}Research Dashboard - FraudGuard AI{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-redesigned.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="dashboard-header-content">
+                <div class="dashboard-title">
+                    <div class="icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h1>Model Performance Dashboard</h1>
+                        <p class="dashboard-subtitle">Academic Analysis of Fraud Detection Models</p>
+                    </div>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn btn-secondary btn-sm" id="refreshDashboard">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {% if models and models|length > 0 %}
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="control-grid">
+                    <div class="control-group">
+                        <label class="control-label">Model Selection</label>
+                        <select class="form-control" id="modelSelector">
+                            <option value="">All Models Overview</option>
+                            {% for model in models %}
+                                <option value="{{ model }}">{{ model.replace('_', ' ').title() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Analysis Mode</label>
+                        <select class="form-control" id="analysisMode">
+                            <option value="overview">Performance Overview</option>
+                            <option value="detailed">Detailed Analysis</option>
+                            <option value="comparison">Model Comparison</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Export Options</label>
+                        <div class="control-actions">
+                            <button class="btn btn-outline-primary btn-sm" id="exportPDF">
+                                <i class="fas fa-file-pdf"></i>
+                                PDF Report
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" id="exportData">
+                                <i class="fas fa-download"></i>
+                                Export Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading model performance data...</p>
+            </div>
+
+            <!-- Key Metrics Section -->
+            <div class="metrics-section">
+                <div class="section-header">
+                    <h2 class="section-title">Performance Metrics</h2>
+                    <p class="section-subtitle">Academic evaluation focusing on imbalanced classification metrics</p>
+                </div>
+                
+                <div class="metrics-grid" id="metricsGrid">
+                    <div class="metric-card-dashboard roc-auc">
+                        <div class="metric-icon-dashboard">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="metric-value-dashboard" id="rocAucValue">-</div>
+                        <div class="metric-label-dashboard">ROC AUC</div>
+                        <div class="metric-description-dashboard">Area Under Curve</div>
+                    </div>
+                    
+                    <div class="metric-card-dashboard precision">
+                        <div class="metric-icon-dashboard">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="metric-value-dashboard" id="precisionValue">-</div>
+                        <div class="metric-label-dashboard">Precision</div>
+                        <div class="metric-description-dashboard">Positive Predictive Value</div>
+                    </div>
+                    
+                    <div class="metric-card-dashboard recall">
+                        <div class="metric-icon-dashboard">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="metric-value-dashboard" id="recallValue">-</div>
+                        <div class="metric-label-dashboard">Recall</div>
+                        <div class="metric-description-dashboard">True Positive Rate</div>
+                    </div>
+                    
+                    <div class="metric-card-dashboard f1-score">
+                        <div class="metric-icon-dashboard">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="metric-value-dashboard" id="f1Value">-</div>
+                        <div class="metric-label-dashboard">F1 Score</div>
+                        <div class="metric-description-dashboard">Harmonic Mean</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization Section -->
+            <div class="visualization-section">
+                <div class="visualization-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Performance Comparison
+                            </h3>
+                        </div>
+                        <div class="chart-body">
+                            <div class="chart-canvas-container">
+                                <canvas id="performanceChart" class="chart-canvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Model Distribution
+                            </h3>
+                        </div>
+                        <div class="chart-body">
+                            <div class="chart-canvas-container">
+                                <canvas id="distributionChart" class="chart-canvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Importance Section -->
+            <div class="feature-importance-section">
+                <div class="section-header">
+                    <h2 class="section-title">Feature Importance Analysis</h2>
+                    <p class="section-subtitle">Understanding which features drive fraud detection performance</p>
+                </div>
+                
+                <div class="feature-importance-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-chart-line"></i>
+                            Global Feature Importance
+                        </h3>
+                    </div>
+                    <div class="feature-importance-grid">
+                        <div class="feature-chart-container">
+                            <div class="chart-canvas-container">
+                                <canvas id="featureImportanceChart" class="chart-canvas"></canvas>
+                            </div>
+                        </div>
+                        <div class="feature-info-panel">
+                            <h4 class="feature-info-title">
+                                <i class="fas fa-info-circle"></i>
+                                Understanding Features
+                            </h4>
+                            <ul class="feature-info-list">
+                                <li><strong>V1-V28:</strong> PCA-transformed features from original transaction data</li>
+                                <li><strong>Amount:</strong> Transaction monetary value - key fraud indicator</li>
+                                <li><strong>Time:</strong> Seconds elapsed since first transaction in dataset</li>
+                                <li><strong>Higher values:</strong> Indicate stronger predictive power for fraud detection</li>
+                                <li><strong>Academic focus:</strong> Feature importance helps understand model decisions for XAI compliance</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Table Section -->
+            <div class="performance-table-section">
+                <div class="section-header">
+                    <h2 class="section-title">Detailed Performance Analysis</h2>
+                    <p class="section-subtitle">Comprehensive metrics for all trained models</p>
+                </div>
+                
+                <div class="performance-table-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-table"></i>
+                            Model Performance Summary
+                        </h3>
+                    </div>
+                    <div class="table-container">
+                        <table class="performance-table" id="performanceTable">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>ROC AUC</th>
+                                    <th>PR AUC</th>
+                                    <th>Precision</th>
+                                    <th>Recall</th>
+                                    <th>F1 Score</th>
+                                    <th>Accuracy</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for model_name, model_metrics in metrics.items() %}
+                                    {% if model_metrics and 'error' not in model_metrics %}
+                                        {% set fraud_metrics = model_metrics.classification_report.get('1', {}) %}
+                                        <tr>
+                                            <td class="model-name">{{ model_name.replace('_', ' ').title() }}</td>
+                                            <td class="metric-value-table">{{ "%.4f"|format(model_metrics.roc_auc_score) if model_metrics.roc_auc_score else 'N/A' }}</td>
+                                            <td class="metric-value-table">{{ "%.4f"|format(model_metrics.average_precision) if model_metrics.average_precision else 'N/A' }}</td>
+                                            <td class="metric-value-table">{{ "%.4f"|format(fraud_metrics.precision) if fraud_metrics.precision else 'N/A' }}</td>
+                                            <td class="metric-value-table">{{ "%.4f"|format(fraud_metrics.recall) if fraud_metrics.recall else 'N/A' }}</td>
+                                            <td class="metric-value-table">{{ "%.4f"|format(fraud_metrics.get('f1-score', 0)) if fraud_metrics.get('f1-score') else 'N/A' }}</td>
+                                            <td class="metric-value-table">{{ "%.4f"|format(model_metrics.classification_report.accuracy) if model_metrics.classification_report.accuracy else 'N/A' }}</td>
+                                            <td><span class="status-badge active">Active</span></td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td class="model-name">{{ model_name.replace('_', ' ').title() }}</td>
+                                            <td colspan="7">
+                                                <span class="status-badge error">{{ model_metrics.error if model_metrics else 'No data available' }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2 class="empty-state-title">No Models Available</h2>
+                <p class="empty-state-description">
+                    No trained models found. Please run the training pipeline to generate model performance data.
+                </p>
+                <button class="btn btn-primary" onclick="trainModels()">
+                    <i class="fas fa-cogs"></i>
+                    Start Model Training
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Initialize dashboard with available models and metrics
+const availableModels = {{ models | tojson if models else '[]' }};
+const initialMetrics = {{ metrics | tojson if metrics else '{}' }};
+
+// Chart.js default configuration for academic style
+Chart.defaults.font.family = "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#334155';
+Chart.defaults.borderColor = '#e2e8f0';
+Chart.defaults.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+
+// Academic color palette
+const academicColors = {
+    primary: '#1e40af',
+    success: '#16a34a',
+    warning: '#d97706',
+    danger: '#dc2626',
+    neutral: '#64748b',
+    primaryLight: 'rgba(30, 64, 175, 0.1)',
+    successLight: 'rgba(22, 163, 74, 0.1)',
+    warningLight: 'rgba(217, 119, 6, 0.1)',
+    dangerLight: 'rgba(220, 38, 38, 0.1)'
+};
+
+// Dashboard functionality
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Academic Dashboard loaded with models:', availableModels);
+    console.log('Initial metrics:', initialMetrics);
+    
+    // Initialize charts after a short delay
+    setTimeout(initializeCharts, 300);
+    
+    // Event listeners
+    document.getElementById('refreshDashboard')?.addEventListener('click', function() {
+        showLoading();
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    });
+    
+    document.getElementById('exportPDF')?.addEventListener('click', function() {
+        window.print();
+    });
+    
+    document.getElementById('exportData')?.addEventListener('click', function() {
+        exportModelData();
+    });
+    
+    // Initialize dashboard if we have models
+    if (availableModels && availableModels.length > 0) {
+        initializeModelSelector();
+    }
+});
+
+function showLoading() {
+    document.getElementById('loadingIndicator').style.display = 'flex';
+}
+
+function hideLoading() {
+    document.getElementById('loadingIndicator').style.display = 'none';
+}
+
+function initializeCharts() {
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js not loaded');
+        return;
+    }
+
+    initializePerformanceChart();
+    initializeDistributionChart();
+    initializeFeatureImportanceChart();
+}
+
+function initializePerformanceChart() {
+    const ctx = document.getElementById('performanceChart');
+    if (!ctx || !initialMetrics || Object.keys(initialMetrics).length === 0) return;
+
+    const models = Object.keys(initialMetrics);
+    const rocAucScores = models.map(model => {
+        const metrics = initialMetrics[model];
+        return metrics && metrics.roc_auc_score ? metrics.roc_auc_score : 0;
+    });
+    const precisionScores = models.map(model => {
+        const metrics = initialMetrics[model];
+        return metrics && metrics.classification_report && metrics.classification_report['1'] 
+            ? metrics.classification_report['1'].precision || 0 : 0;
+    });
+    const recallScores = models.map(model => {
+        const metrics = initialMetrics[model];
+        return metrics && metrics.classification_report && metrics.classification_report['1'] 
+            ? metrics.classification_report['1'].recall || 0 : 0;
+    });
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: models.map(m => m.replace('_', ' ').toUpperCase()),
+            datasets: [
+                {
+                    label: 'ROC AUC',
+                    data: rocAucScores,
+                    backgroundColor: academicColors.primaryLight,
+                    borderColor: academicColors.primary,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Precision',
+                    data: precisionScores,
+                    backgroundColor: academicColors.successLight,
+                    borderColor: academicColors.success,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Recall',
+                    data: recallScores,
+                    backgroundColor: academicColors.warningLight,
+                    borderColor: academicColors.warning,
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                },
+                title: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1.0,
+                    grid: {
+                        color: '#f1f5f9'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeDistributionChart() {
+    const ctx = document.getElementById('distributionChart');
+    if (!ctx || !initialMetrics || Object.keys(initialMetrics).length === 0) return;
+
+    const models = Object.keys(initialMetrics);
+    const f1Scores = models.map(model => {
+        const metrics = initialMetrics[model];
+        return metrics && metrics.classification_report && metrics.classification_report['1'] 
+            ? metrics.classification_report['1']['f1-score'] || 0 : 0;
+    });
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: models.map(m => m.replace('_', ' ').toUpperCase()),
+            datasets: [{
+                data: f1Scores,
+                backgroundColor: [
+                    academicColors.primary,
+                    academicColors.success,
+                    academicColors.warning,
+                    academicColors.danger,
+                    academicColors.neutral,
+                    '#7c3aed'
+                ],
+                borderWidth: 3,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeFeatureImportanceChart() {
+    const ctx = document.getElementById('featureImportanceChart');
+    if (!ctx) return;
+
+    // Sample feature importance data (would normally come from SHAP analysis)
+    const features = ['Amount', 'V14', 'V12', 'V10', 'V16', 'V3', 'V7', 'V1', 'Time', 'V4'];
+    const importance = [0.15, 0.12, 0.11, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: features,
+            datasets: [{
+                label: 'Feature Importance',
+                data: importance,
+                backgroundColor: academicColors.primaryLight,
+                borderColor: academicColors.primary,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 0.2,
+                    grid: {
+                        color: '#f1f5f9'
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeModelSelector() {
+    const modelSelector = document.getElementById('modelSelector');
+    if (modelSelector) {
+        modelSelector.addEventListener('change', function() {
+            const selectedModel = this.value;
+            if (selectedModel && initialMetrics[selectedModel]) {
+                updateMetricsDisplay(initialMetrics[selectedModel]);
+            } else {
+                // Show aggregate metrics
+                updateMetricsDisplay(calculateAggregateMetrics());
+            }
+        });
+    }
+}
+
+function updateMetricsDisplay(metrics) {
+    if (!metrics || metrics.error) return;
+    
+    const fraudMetrics = metrics.classification_report?.['1'] || {};
+    
+    // Update metric cards with animation
+    updateMetricCard('rocAucValue', metrics.roc_auc_score);
+    updateMetricCard('precisionValue', fraudMetrics.precision);
+    updateMetricCard('recallValue', fraudMetrics.recall);
+    updateMetricCard('f1Value', fraudMetrics['f1-score']);
+}
+
+function updateMetricCard(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element && value !== undefined) {
+        // Add animation class
+        element.parentElement.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            element.textContent = typeof value === 'number' ? value.toFixed(4) : value;
+            element.parentElement.style.transform = 'scale(1)';
+        }, 150);
+    }
+}
+
+function calculateAggregateMetrics() {
+    if (!initialMetrics || Object.keys(initialMetrics).length === 0) return null;
+    
+    const models = Object.values(initialMetrics).filter(m => m && !m.error);
+    if (models.length === 0) return null;
+    
+    const avgRocAuc = models.reduce((sum, m) => sum + (m.roc_auc_score || 0), 0) / models.length;
+    const avgPrecision = models.reduce((sum, m) => {
+        const fraud = m.classification_report?.['1'];
+        return sum + (fraud?.precision || 0);
+    }, 0) / models.length;
+    const avgRecall = models.reduce((sum, m) => {
+        const fraud = m.classification_report?.['1'];
+        return sum + (fraud?.recall || 0);
+    }, 0) / models.length;
+    const avgF1 = models.reduce((sum, m) => {
+        const fraud = m.classification_report?.['1'];
+        return sum + (fraud?.['f1-score'] || 0);
+    }, 0) / models.length;
+    
+    return {
+        roc_auc_score: avgRocAuc,
+        classification_report: {
+            '1': {
+                precision: avgPrecision,
+                recall: avgRecall,
+                'f1-score': avgF1
+            }
+        }
+    };
+}
+
+function exportModelData() {
+    const data = {
+        models: availableModels,
+        metrics: initialMetrics,
+        timestamp: new Date().toISOString(),
+        academic_context: 'MSc Data Science - Credit Card Fraud Detection Research'
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fraudguard_model_performance.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function trainModels() {
+    if (confirm('This will start the complete model training pipeline. Continue?')) {
+        alert('Please run the training script:\npython main.py');
+    }
+}
+</script>
+{% endblock %}

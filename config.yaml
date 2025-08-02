@@ -1,0 +1,65 @@
+# Configuration file for FraudGuard Application
+
+# Data Configuration
+data:
+  source: "kaggle"  # kaggle, local, url
+  kaggle_dataset: "mlg-ulb/creditcardfraud"
+  local_path: "data/creditcard.csv"
+  test_size: 0.2
+  validation_size: 0.1
+  random_state: 42
+
+# Preprocessing Configuration
+preprocessing:
+  scaling_method: "standard"  # standard, minmax, robust
+  handle_outliers: true
+  outlier_method: "iqr"  # iqr, isolation_forest, z_score
+  feature_engineering:
+    time_features: true
+    amount_features: true
+    interaction_features: false
+
+# Model Configuration
+models:
+  train_all: true
+  cross_validation: true
+  cv_folds: 5
+  hyperparameter_tuning: true
+  ensemble_method: "voting"  # voting, stacking
+
+# Imbalance Handling
+imbalance:
+  method: "class_weight"  # smote, class_weight, undersampling, ensemble
+  smote_k_neighbors: 5
+  sampling_strategy: "auto"
+
+# Explainability Configuration
+explainability:
+  enable_shap: true
+  enable_lime: true
+  shap_background_size: 100
+  lime_num_features: 10
+  generate_plots: true
+
+# Web Application Configuration
+web_app:
+  host: "0.0.0.0"
+  port: 5000
+  debug: true
+  secret_key: "your-secret-key-here"
+  max_content_length: 16777216  # 16MB
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_to_file: true
+  log_dir: "logs"
+  max_log_files: 10
+
+# Deployment Configuration
+deployment:
+  environment: "development"  # development, production
+  use_gpu: false
+  model_serving:
+    batch_size: 32
+    timeout: 30

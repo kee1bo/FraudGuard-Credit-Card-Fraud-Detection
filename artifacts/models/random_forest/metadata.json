@@ -1,0 +1,54 @@
+{
+  "model_name": "Random Forest",
+  "is_trained": true,
+  "training_config": {},
+  "metrics": {
+    "accuracy": 0.9993333333333333,
+    "precision": 0.9966666666666667,
+    "recall": 0.9966666666666667,
+    "f1_score": 0.9966666666666667,
+    "confusion_matrix": [
+      [
+        2699,
+        1
+      ],
+      [
+        1,
+        299
+      ]
+    ],
+    "classification_report": {
+      "0": {
+        "precision": 0.9996296296296296,
+        "recall": 0.9996296296296296,
+        "f1-score": 0.9996296296296296,
+        "support": 2700.0
+      },
+      "1": {
+        "precision": 0.9966666666666667,
+        "recall": 0.9966666666666667,
+        "f1-score": 0.9966666666666667,
+        "support": 300.0
+      },
+      "accuracy": 0.9993333333333333,
+      "macro avg": {
+        "precision": 0.9981481481481482,
+        "recall": 0.9981481481481482,
+        "f1-score": 0.9981481481481482,
+        "support": 3000.0
+      },
+      "weighted avg": {
+        "precision": 0.9993333333333333,
+        "recall": 0.9993333333333333,
+        "f1-score": 0.9993333333333333,
+        "support": 3000.0
+      }
+    },
+    "roc_auc_score": 0.9999938271604938,
+    "average_precision": 0.9999444798793568,
+    "model_name": "random_forest",
+    "test_set_size": 3000,
+    "fraud_rate": 0.1,
+    "prediction_rate": 0.1
+  }
+}

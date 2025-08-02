@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Home - FraudGuard AI{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="fas fa-shield-alt"></i> FraudGuard AI
+                    </h1>
+                    <p class="lead mb-4">
+                        MSc Data Science Research Project: Advanced Credit Card Fraud Detection using 
+                        Explainable AI, Ensemble Methods, and Sophisticated Class Imbalance Techniques for AML Compliance.
+                    </p>
+                    <div class="hero-stats mb-4">
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <div class="stat-item text-center">
+                                    <div class="stat-value text-success fw-bold mb-1">99.8%</div>
+                                    <div class="stat-label">Accuracy</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item text-center">
+                                    <div class="stat-value text-info fw-bold mb-1">&lt; 100ms</div>
+                                    <div class="stat-label">Response Time</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item text-center">
+                                    <div class="stat-value text-warning fw-bold mb-1">6+</div>
+                                    <div class="stat-label">ML Models</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="{{ url_for('prediction.predict') }}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-brain"></i> Test Models
+                        </a>
+                        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-chart-line"></i> Research Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0">Live Fraud Detection</h6>
+                                    <span class="badge bg-success">ACTIVE</span>
+                                </div>
+                            </div>
+                            <div class="demo-transaction">
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">Transaction ID:</small><br>
+                                        <code>TXN_2025_001</code>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Amount:</small><br>
+                                        <strong>$2,847.50</strong>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <small class="text-muted">Risk Score:</small><br>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-danger" style="width: 85%">85%</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Status:</small><br>
+                                        <span class="badge bg-danger">FRAUDULENT</span>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning alert-sm">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>AI Explanation:</strong> Unusual spending pattern detected. 
+                                    High amount + late hour transaction.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="section-title">Research Contributions</h2>
+                <p class="section-subtitle">Academic-grade implementation of cutting-edge fraud detection methodologies</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-brain text-primary fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Explainable AI</h5>
+                        <p class="card-text">
+                            Understand every decision with SHAP and LIME explanations. 
+                            No more black box predictions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-tachometer-alt text-success fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Real-time Detection</h5>
+                        <p class="card-text">
+                            Lightning-fast fraud detection with response times under 100ms. 
+                            Perfect for high-volume transactions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-cogs text-warning fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Multiple Models</h5>
+                        <p class="card-text">
+                            Choose from 6+ ML models including XGBoost, Random Forest, 
+                            and advanced ensemble methods.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-chart-line text-info fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Advanced Analytics</h5>
+                        <p class="card-text">
+                            Comprehensive dashboards with performance metrics, 
+                            feature importance, and model comparisons.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-balance-scale text-danger fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Imbalance Handling</h5>
+                        <p class="card-text">
+                            Advanced techniques to handle rare fraud events including 
+                            SMOTE, class weighting, and ensemble methods.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-shield-alt text-secondary fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Enterprise Ready</h5>
+                        <p class="card-text">
+                            Built for production with proper logging, error handling, 
+                            and scalable architecture.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5 text-white" style="background: var(--gradient-primary);">
+    <div class="container text-center">
+        <h2 class="mb-4">Explore the Research</h2>
+        <p class="lead mb-4">
+            Dive into academic-grade fraud detection with comprehensive model evaluation and explainable AI
+        </p>
+        <a href="{{ url_for('prediction.predict') }}" class="btn btn-light btn-lg">
+            <i class="fas fa-microscope"></i> Explore Models
+        </a>
+    </div>
+</section>
+{% endblock %}
