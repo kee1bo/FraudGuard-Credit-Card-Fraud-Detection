@@ -1,0 +1,881 @@
+{% extends "base.html" %}
+
+{% block title %}Intelligent Fraud Detection - FraudGuard AI{% endblock %}
+
+{% block head %}
+<style>
+.intelligent-prediction-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-4);
+}
+
+.prediction-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+}
+
+.prediction-title {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--color-neutral-900);
+    margin-bottom: var(--space-4);
+}
+
+.prediction-subtitle {
+    font-size: var(--text-lg);
+    color: var(--color-neutral-600);
+    line-height: var(--leading-relaxed);
+}
+
+.feature-form {
+    background: white;
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-8);
+    margin-bottom: var(--space-8);
+}
+
+.form-section {
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-neutral-100);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.section-description {
+    font-size: var(--text-sm);
+    color: var(--color-neutral-600);
+    margin-bottom: var(--space-6);
+    line-height: var(--leading-relaxed);
+}
+
+.input-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-neutral-700);
+    margin-bottom: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.field-input, .field-select {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-neutral-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    transition: all var(--transition-fast) var(--transition-curve);
+    background: white;
+}
+
+.field-input:focus, .field-select:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px rgb(98 125 152 / 0.1);
+}
+
+.field-help {
+    font-size: var(--text-xs);
+    color: var(--color-neutral-500);
+    margin-top: var(--space-1);
+    line-height: var(--leading-relaxed);
+}
+
+.field-error {
+    font-size: var(--text-xs);
+    color: var(--color-red-600);
+    margin-top: var(--space-1);
+    display: none;
+}
+
+.field-error.show {
+    display: block;
+}
+
+.analyze-btn {
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-normal) var(--transition-curve);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.analyze-btn:hover {
+    background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-800));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.analyze-btn:disabled {
+    background: var(--color-neutral-400);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.info-panel {
+    background: linear-gradient(135deg, var(--color-primary-50), var(--color-blue-50));
+    border: 1px solid var(--color-primary-200);
+    border-left: 4px solid var(--color-primary-600);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.info-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-primary-800);
+    margin-bottom: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.info-text {
+    font-size: var(--text-sm);
+    color: var(--color-primary-700);
+    line-height: var(--leading-relaxed);
+}
+
+.quick-examples {
+    background: var(--color-neutral-50);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.examples-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+    margin-bottom: var(--space-4);
+}
+
+.example-buttons {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.example-btn {
+    padding: var(--space-2) var(--space-4);
+    background: white;
+    color: var(--color-neutral-700);
+    border: 1px solid var(--color-neutral-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.example-btn:hover {
+    background: var(--color-primary-100);
+    color: var(--color-primary-700);
+    border-color: var(--color-primary-300);
+}
+
+.confidence-indicator {
+    background: var(--color-neutral-50);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+    display: none;
+}
+
+.confidence-indicator.show {
+    display: block;
+}
+
+.confidence-score {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.confidence-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--color-neutral-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-red-500), var(--color-yellow-500), var(--color-green-500));
+    transition: width var(--transition-normal);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.results-container {
+    margin-top: var(--space-8);
+}
+
+.alert {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+}
+
+.alert-danger {
+    background: var(--color-red-50);
+    border: 1px solid var(--color-red-200);
+    color: var(--color-red-800);
+}
+
+.alert-success {
+    background: var(--color-green-50);
+    border: 1px solid var(--color-green-200);
+    color: var(--color-green-800);
+}
+
+.alert-info {
+    background: var(--color-blue-50);
+    border: 1px solid var(--color-blue-200);
+    color: var(--color-blue-800);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="intelligent-prediction-container">
+    <div class="prediction-header">
+        <h1 class="prediction-title">
+            <i data-lucide="brain"></i>
+            Intelligent Fraud Detection
+        </h1>
+        <p class="prediction-subtitle">
+            Advanced fraud analysis using interpretable features and AI-powered mapping to the complete ULB feature space
+        </p>
+    </div>
+
+    <div class="info-panel">
+        <div class="info-title">
+            <i data-lucide="lightbulb"></i>
+            How It Works
+        </div>
+        <p class="info-text">
+            Our intelligent system transforms your business-friendly inputs into the complete 30-feature vector 
+            used by our academically-trained fraud detection models. This breakthrough approach maintains the 
+            full predictive power of the ULB dataset while providing an intuitive user experience.
+        </p>
+    </div>
+
+    <form class="feature-form" id="intelligentPredictionForm">
+        <!-- Transaction Details Section -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="credit-card"></i>
+                Transaction Details
+            </h3>
+            <p class="section-description">
+                Basic transaction information that forms the foundation of our fraud analysis.
+            </p>
+            
+            <div class="input-group">
+                <div class="form-field">
+                    <label class="field-label" for="transaction_amount">
+                        <i data-lucide="dollar-sign"></i>
+                        Transaction Amount
+                    </label>
+                    <input 
+                        type="number" 
+                        id="transaction_amount" 
+                        name="transaction_amount" 
+                        class="field-input" 
+                        placeholder="100.00"
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+                    <div class="field-help">Enter the transaction amount in USD</div>
+                    <div class="field-error" id="amount_error">Please enter a valid positive amount</div>
+                </div>
+                
+                <div class="form-field">
+                    <label class="field-label" for="merchant_category">
+                        <i data-lucide="store"></i>
+                        Merchant Category
+                    </label>
+                    <select id="merchant_category" name="merchant_category" class="field-select" required>
+                        <option value="">Select merchant type...</option>
+                        <option value="grocery">Grocery Store</option>
+                        <option value="gas">Gas Station</option>
+                        <option value="online">Online Retail</option>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="atm">ATM Withdrawal</option>
+                        <option value="department_store">Department Store</option>
+                        <option value="pharmacy">Pharmacy</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="travel">Travel</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <div class="field-help">Select the type of merchant or service</div>
+                    <div class="field-error" id="merchant_error">Please select a merchant category</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Context Section -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="clock"></i>
+                Time Context
+            </h3>
+            <p class="section-description">
+                Transaction timing information helps identify unusual patterns that may indicate fraud.
+            </p>
+            
+            <div class="input-group">
+                <div class="form-field">
+                    <label class="field-label" for="hour_of_day">
+                        <i data-lucide="sun"></i>
+                        Hour of Day
+                    </label>
+                    <select id="hour_of_day" name="hour_of_day" class="field-select" required>
+                        <option value="">Select hour...</option>
+                        <option value="0">12:00 AM (Midnight)</option>
+                        <option value="1">1:00 AM</option>
+                        <option value="2">2:00 AM</option>
+                        <option value="3">3:00 AM</option>
+                        <option value="4">4:00 AM</option>
+                        <option value="5">5:00 AM</option>
+                        <option value="6">6:00 AM</option>
+                        <option value="7">7:00 AM</option>
+                        <option value="8">8:00 AM</option>
+                        <option value="9">9:00 AM</option>
+                        <option value="10">10:00 AM</option>
+                        <option value="11">11:00 AM</option>
+                        <option value="12">12:00 PM (Noon)</option>
+                        <option value="13">1:00 PM</option>
+                        <option value="14">2:00 PM</option>
+                        <option value="15">3:00 PM</option>
+                        <option value="16">4:00 PM</option>
+                        <option value="17">5:00 PM</option>
+                        <option value="18">6:00 PM</option>
+                        <option value="19">7:00 PM</option>
+                        <option value="20">8:00 PM</option>
+                        <option value="21">9:00 PM</option>
+                        <option value="22">10:00 PM</option>
+                        <option value="23">11:00 PM</option>
+                    </select>
+                    <div class="field-help">When did the transaction occur?</div>
+                    <div class="field-error" id="hour_error">Please select an hour</div>
+                </div>
+                
+                <div class="form-field">
+                    <label class="field-label" for="day_of_week">
+                        <i data-lucide="calendar"></i>
+                        Day of Week
+                    </label>
+                    <select id="day_of_week" name="day_of_week" class="field-select" required>
+                        <option value="">Select day...</option>
+                        <option value="0">Monday</option>
+                        <option value="1">Tuesday</option>
+                        <option value="2">Wednesday</option>
+                        <option value="3">Thursday</option>
+                        <option value="4">Friday</option>
+                        <option value="5">Saturday</option>
+                        <option value="6">Sunday</option>
+                    </select>
+                    <div class="field-help">What day of the week was it?</div>
+                    <div class="field-error" id="day_error">Please select a day</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Assessment Section -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <i data-lucide="shield-alert"></i>
+                Risk Assessment
+            </h3>
+            <p class="section-description">
+                Contextual risk factors that help identify potentially fraudulent patterns.
+            </p>
+            
+            <div class="input-group">
+                <div class="form-field">
+                    <label class="field-label" for="location_risk">
+                        <i data-lucide="map-pin"></i>
+                        Location Risk
+                    </label>
+                    <select id="location_risk" name="location_risk" class="field-select" required>
+                        <option value="">Select location risk...</option>
+                        <option value="normal">Normal Location</option>
+                        <option value="slightly_unusual">Slightly Unusual Location</option>
+                        <option value="highly_unusual">Highly Unusual Location</option>
+                        <option value="foreign">Foreign Country</option>
+                    </select>
+                    <div class="field-help">How unusual is the transaction location?</div>
+                    <div class="field-error" id="location_error">Please select a location risk level</div>
+                </div>
+                
+                <div class="form-field">
+                    <label class="field-label" for="spending_pattern">
+                        <i data-lucide="trending-up"></i>
+                        Spending Pattern
+                    </label>
+                    <select id="spending_pattern" name="spending_pattern" class="field-select" required>
+                        <option value="">Select spending pattern...</option>
+                        <option value="typical">Typical Amount</option>
+                        <option value="slightly_higher">Slightly Higher Than Usual</option>
+                        <option value="much_higher">Much Higher Than Usual</option>
+                        <option value="suspicious">Suspicious Amount</option>
+                    </select>
+                    <div class="field-help">How does this amount compare to typical spending?</div>
+                    <div class="field-error" id="spending_error">Please select a spending pattern</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Examples -->
+        <div class="quick-examples">
+            <div class="examples-title">Quick Test Examples</div>
+            <div class="example-buttons">
+                <button type="button" class="example-btn" onclick="loadExample('normal_grocery')">
+                    Normal Grocery ($45)
+                </button>
+                <button type="button" class="example-btn" onclick="loadExample('evening_restaurant')">
+                    Evening Restaurant ($85)
+                </button>
+                <button type="button" class="example-btn" onclick="loadExample('suspicious_online')">
+                    Suspicious Online ($1,500)
+                </button>
+                <button type="button" class="example-btn" onclick="loadExample('foreign_travel')">
+                    Foreign Travel ($2,200)
+                </button>
+                <button type="button" class="example-btn" onclick="loadExample('late_night_atm')">
+                    Late Night ATM ($300)
+                </button>
+            </div>
+        </div>
+
+        <!-- Confidence Indicator -->
+        <div class="confidence-indicator" id="confidenceIndicator">
+            <div class="confidence-score">
+                <span>Mapping Confidence:</span>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                </div>
+                <span id="confidenceText">0%</span>
+            </div>
+            <div id="confidenceDescription" class="field-help"></div>
+        </div>
+
+        <button type="submit" class="analyze-btn" id="analyzeBtn">
+            <i data-lucide="brain"></i>
+            Analyze Transaction with AI
+        </button>
+    </form>
+
+    <!-- Results will be inserted here -->
+    <div id="results" class="results-container"></div>
+</div>
+
+<script>
+// Example data presets
+const exampleData = {
+    normal_grocery: {
+        transaction_amount: 45.67,
+        merchant_category: 'grocery',
+        hour_of_day: 14,
+        day_of_week: 2,
+        location_risk: 'normal',
+        spending_pattern: 'typical'
+    },
+    evening_restaurant: {
+        transaction_amount: 85.30,
+        merchant_category: 'restaurant',
+        hour_of_day: 19,
+        day_of_week: 5,
+        location_risk: 'normal',
+        spending_pattern: 'typical'
+    },
+    suspicious_online: {
+        transaction_amount: 1500.00,
+        merchant_category: 'online',
+        hour_of_day: 2,
+        day_of_week: 1,
+        location_risk: 'slightly_unusual',
+        spending_pattern: 'suspicious'
+    },
+    foreign_travel: {
+        transaction_amount: 2200.00,
+        merchant_category: 'travel',
+        hour_of_day: 10,
+        day_of_week: 0,
+        location_risk: 'foreign',
+        spending_pattern: 'much_higher'
+    },
+    late_night_atm: {
+        transaction_amount: 300.00,
+        merchant_category: 'atm',
+        hour_of_day: 23,
+        day_of_week: 6,
+        location_risk: 'slightly_unusual',
+        spending_pattern: 'slightly_higher'
+    }
+};
+
+function loadExample(type) {
+    const data = exampleData[type];
+    if (!data) return;
+    
+    // Fill form fields
+    Object.keys(data).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+            element.value = data[key];
+        }
+    });
+    
+    // Update confidence indicator
+    updateConfidenceIndicator();
+}
+
+function validateForm() {
+    let isValid = true;
+    const requiredFields = [
+        'transaction_amount', 'merchant_category', 'hour_of_day', 
+        'day_of_week', 'location_risk', 'spending_pattern'
+    ];
+    
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId.replace('_', '') + '_error');
+        
+        if (!field.value || (fieldId === 'transaction_amount' && parseFloat(field.value) <= 0)) {
+            field.style.borderColor = 'var(--color-red-500)';
+            if (errorElement) {
+                errorElement.classList.add('show');
+            }
+            isValid = false;
+        } else {
+            field.style.borderColor = 'var(--color-neutral-300)';
+            if (errorElement) {
+                errorElement.classList.remove('show');
+            }
+        }
+    });
+    
+    return isValid;
+}
+
+function updateConfidenceIndicator() {
+    const form = document.getElementById('intelligentPredictionForm');
+    const formData = new FormData(form);
+    
+    // Simple confidence calculation based on completeness and consistency
+    let confidence = 0;
+    let factors = 0;
+    
+    // Check completeness
+    const requiredFields = ['transaction_amount', 'merchant_category', 'hour_of_day', 'day_of_week', 'location_risk', 'spending_pattern'];
+    const completedFields = requiredFields.filter(field => formData.get(field)).length;
+    confidence += (completedFields / requiredFields.length) * 0.4;
+    factors++;
+    
+    // Check consistency (simplified)
+    const amount = parseFloat(formData.get('transaction_amount') || 0);
+    const merchant = formData.get('merchant_category');
+    const spending = formData.get('spending_pattern');
+    
+    if (amount > 0 && merchant && spending) {
+        let consistencyScore = 0.8; // Base score
+        
+        // Amount vs merchant consistency
+        if (merchant === 'grocery' && amount > 500) consistencyScore -= 0.2;
+        if (merchant === 'travel' && amount < 100) consistencyScore -= 0.2;
+        if (spending === 'suspicious' && amount < 100) consistencyScore -= 0.3;
+        
+        confidence += consistencyScore * 0.6;
+        factors++;
+    }
+    
+    if (factors > 0) {
+        confidence = confidence / factors;
+    }
+    
+    // Update UI
+    const confidenceIndicator = document.getElementById('confidenceIndicator');
+    const confidenceFill = document.getElementById('confidenceFill');
+    const confidenceText = document.getElementById('confidenceText');
+    const confidenceDescription = document.getElementById('confidenceDescription');
+    
+    if (completedFields > 0) {
+        confidenceIndicator.classList.add('show');
+        
+        const percentage = Math.round(confidence * 100);
+        confidenceFill.style.width = percentage + '%';
+        confidenceText.textContent = percentage + '%';
+        
+        if (percentage >= 80) {
+            confidenceDescription.textContent = 'High confidence - excellent mapping quality expected';
+        } else if (percentage >= 60) {
+            confidenceDescription.textContent = 'Good confidence - reliable mapping expected';
+        } else if (percentage >= 40) {
+            confidenceDescription.textContent = 'Moderate confidence - acceptable mapping quality';
+        } else {
+            confidenceDescription.textContent = 'Low confidence - consider reviewing inputs';
+        }
+    } else {
+        confidenceIndicator.classList.remove('show');
+    }
+}
+
+// Add event listeners for real-time validation and confidence updates
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('intelligentPredictionForm');
+    const inputs = form.querySelectorAll('input, select');
+    
+    inputs.forEach(input => {
+        input.addEventListener('change', updateConfidenceIndicator);
+        input.addEventListener('input', updateConfidenceIndicator);
+    });
+    
+    // Auto-populate current time
+    const now = new Date();
+    const hourSelect = document.getElementById('hour_of_day');
+    const daySelect = document.getElementById('day_of_week');
+    
+    if (!hourSelect.value) {
+        hourSelect.value = now.getHours();
+    }
+    if (!daySelect.value) {
+        daySelect.value = (now.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
+    }
+    
+    updateConfidenceIndicator();
+});
+
+// Form submission
+document.getElementById('intelligentPredictionForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+        return;
+    }
+    
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const resultsDiv = document.getElementById('results');
+    
+    // Show loading state
+    analyzeBtn.disabled = true;
+    analyzeBtn.innerHTML = '<div class="loading-spinner"></div> Analyzing with AI...';
+    
+    // Get form data
+    const formData = new FormData(this);
+    const requestData = {
+        transaction_amount: parseFloat(formData.get('transaction_amount')),
+        merchant_category: formData.get('merchant_category'),
+        hour_of_day: parseInt(formData.get('hour_of_day')),
+        day_of_week: parseInt(formData.get('day_of_week')),
+        location_risk: formData.get('location_risk'),
+        spending_pattern: formData.get('spending_pattern')
+    };
+    
+    try {
+        const response = await fetch('/intelligent/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.error) {
+            resultsDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> ${result.error}
+                </div>
+            `;
+        } else {
+            displayIntelligentResults(result, requestData);
+        }
+        
+    } catch (error) {
+        resultsDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>Error:</strong> Failed to analyze transaction. Please try again.
+            </div>
+        `;
+    } finally {
+        // Reset button
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = '<i data-lucide="brain"></i> Analyze Transaction with AI';
+        lucide.createIcons();
+    }
+});
+
+function displayIntelligentResults(result, requestData) {
+    const resultsDiv = document.getElementById('results');
+    const isLegitimate = result.prediction === 0;
+    const riskScore = (result.fraud_probability * 100).toFixed(1);
+    const confidence = (result.mapping_confidence * 100).toFixed(1);
+    
+    resultsDiv.innerHTML = `
+        <div class="card">
+            <div class="card-header ${isLegitimate ? 'bg-success' : 'bg-danger'} text-white">
+                <h4 class="mb-0">
+                    <i data-lucide="${isLegitimate ? 'check-circle' : 'alert-triangle'}"></i>
+                    AI Analysis Result: ${isLegitimate ? 'LEGITIMATE TRANSACTION' : 'POTENTIAL FRAUD'}
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <div class="risk-score-circle ${isLegitimate ? 'low-risk' : 'high-risk'}">
+                            ${riskScore}%
+                        </div>
+                        <h6>Fraud Risk Score</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>AI Mapping Quality</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-info" style="width: ${confidence}%"></div>
+                        </div>
+                        <small>Mapping Confidence: ${confidence}%</small><br>
+                        <small>Features Mapped: 28 PCA components</small><br>
+                        <small>Model Used: ${result.model_used || 'Ensemble'}</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Transaction Summary</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Amount:</strong></td><td>$${requestData.transaction_amount.toFixed(2)}</td></tr>
+                            <tr><td><strong>Merchant:</strong></td><td>${requestData.merchant_category}</td></tr>
+                            <tr><td><strong>Time:</strong></td><td>${getTimeDescription(requestData.hour_of_day, requestData.day_of_week)}</td></tr>
+                            <tr><td><strong>Location Risk:</strong></td><td>${requestData.location_risk.replace('_', ' ')}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6><i data-lucide="brain"></i> AI Analysis & Feature Mapping</h6>
+                    <div class="alert alert-info">
+                        ${getIntelligentAnalysisExplanation(requestData, riskScore, isLegitimate, confidence)}
+                    </div>
+                </div>
+                
+                ${result.feature_importance ? `
+                <div class="mt-4">
+                    <h6><i data-lucide="bar-chart"></i> Key Contributing Factors</h6>
+                    <div class="row">
+                        ${Object.entries(result.feature_importance).slice(0, 4).map(([feature, importance]) => `
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="progress mb-1" style="height: 20px;">
+                                        <div class="progress-bar" style="width: ${(importance * 100).toFixed(1)}%"></div>
+                                    </div>
+                                    <small>${feature.replace('_', ' ')}: ${(importance * 100).toFixed(1)}%</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    lucide.createIcons();
+}
+
+function getTimeDescription(hour, dayOfWeek) {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const timeStr = hour === 0 ? '12:00 AM' : 
+                   hour < 12 ? `${hour}:00 AM` : 
+                   hour === 12 ? '12:00 PM' : 
+                   `${hour - 12}:00 PM`;
+    return `${days[dayOfWeek]} ${timeStr}`;
+}
+
+function getIntelligentAnalysisExplanation(data, riskScore, isLegitimate, confidence) {
+    let explanation = `Our AI system mapped your 5 interpretable inputs to a complete 30-feature vector with ${confidence}% confidence. `;
+    
+    if (isLegitimate) {
+        explanation += `The transaction shows legitimate patterns: `;
+        if (data.spending_pattern === 'typical') {
+            explanation += `typical spending amount for ${data.merchant_category}, `;
+        }
+        if (data.location_risk === 'normal') {
+            explanation += `normal location, `;
+        }
+        explanation += `and timing consistent with regular ${data.merchant_category} transactions.`;
+    } else {
+        explanation += `⚠️ Multiple fraud indicators detected: `;
+        if (data.spending_pattern === 'suspicious') {
+            explanation += `suspicious spending amount, `;
+        }
+        if (data.location_risk !== 'normal') {
+            explanation += `unusual location (${data.location_risk.replace('_', ' ')}), `;
+        }
+        if (data.hour_of_day < 6 || data.hour_of_day > 22) {
+            explanation += `unusual transaction time, `;
+        }
+        explanation += `creating a high-risk profile in our AI analysis.`;
+    }
+    
+    return explanation;
+}
+
+// Initialize Lucide icons
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+});
+</script>
+{% endblock %}

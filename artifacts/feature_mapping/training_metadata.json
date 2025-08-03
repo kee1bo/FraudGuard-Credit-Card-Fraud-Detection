@@ -1,0 +1,35 @@
+{
+  "training_stats": {
+    "dataset_size": 5000,
+    "training_size": 3500,
+    "validation_size": 500,
+    "test_size": 1000,
+    "training_time": 25.758420705795288,
+    "models_trained": [
+      "random_forest",
+      "xgboost"
+    ]
+  },
+  "evaluation_results": {
+    "random_forest": {
+      "test_mse": 0.7013690039140059,
+      "test_mae": 0.5478591881948244,
+      "avg_correlation": 0.37445735267060554,
+      "correlation_preservation": 0.37445735267060554
+    },
+    "xgboost": {
+      "test_mse": 0.6813535560138371,
+      "test_mae": 0.5398694166913744,
+      "avg_correlation": 0.38670886759977224,
+      "correlation_preservation": 0.38670886759977224
+    }
+  },
+  "training_config": {
+    "dataset_path": "data/creditcard.csv",
+    "sample_size": 5000,
+    "test_size": 0.2,
+    "validation_size": 0.1,
+    "random_state": 42
+  },
+  "timestamp": "2025-08-03 23:34:36"
+}

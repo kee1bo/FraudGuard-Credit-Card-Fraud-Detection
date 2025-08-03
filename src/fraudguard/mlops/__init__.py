@@ -1,20 +1,14 @@
 """
-ML Operations Module for Professional Model Management
+MLOps module for FraudGuard
+Handles model lifecycle management, versioning, and deployment
 """
 
-from .model_manager import MLModelManager
-from .model_metadata import ModelMetadata, PerformanceMetrics, ModelVersion
-from .model_registry import ModelRegistry
-from .performance_monitor import PerformanceMonitor
-from .experiment_tracker import ExperimentTracker, Experiment
+from .mapping_model_registry import MappingModelRegistry, get_mapping_model_registry
+from .deployment_manager import DeploymentManager, get_deployment_manager
 
 __all__ = [
-    'MLModelManager',
-    'ModelMetadata', 
-    'PerformanceMetrics',
-    'ModelVersion',
-    'ModelRegistry',
-    'PerformanceMonitor',
-    'ExperimentTracker',
-    'Experiment'
+    'MappingModelRegistry', 
+    'get_mapping_model_registry',
+    'DeploymentManager',
+    'get_deployment_manager'
 ]

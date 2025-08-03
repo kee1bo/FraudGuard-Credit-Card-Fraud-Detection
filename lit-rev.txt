@@ -1,0 +1,187 @@
+Credit Card Fraud Detection with Explainable AI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Table of Contents
+Credit Card Fraud Detection with Explainable AI
+Table of Contents
+1. Introduction
+2. Literature Review
+2.1 The Shifting Sands: Credit Card Fraud Today
+2.2 Getting to Grips with the Data: The ULB Kaggle Dataset
+2.3 Smarter Defenses: Advanced Machine Learning in Fraud Detection
+2.4 Leveling the Playing Field: Tackling Class Imbalance
+2.5 Keeping Up: Dealing with Concept Drift in Fraud
+2.6 Why Did It Do That? The Need for Explainable AI (XAI)
+2.7 Seeing is Believing: Dashboards for Fraud Insights and AML
+2.8 How Do We Know It's Working? Evaluating Fraud Detection Systems
+2.9 Doing the Right Thing: Ethics and Law in AI Fraud Detection
+3. References
+
+
+
+1. Introduction
+
+The rise of digital payments and online shopping has undeniably changed how we buy and sell things, bringing amazing convenience and speed to commerce worldwide. But this digital shift has also opened the door to a new, more complex world of financial crime. Credit card fraud, in particular, has become a major headache, causing significant economic damage (Anderson, 2022). It's not just banks that feel the pinch; merchants and everyday consumers also suffer from these fraudulent acts. Beyond the direct financial losses, fraud eats away at customer trust and forces businesses to spend heavily on trying to stop and catch it.
+The Nilson Report, a respected source for payment industry data, paints a worrying picture. According to their latest findings, global payment card fraud losses reached $33.83 billion in 2023, with projections suggesting losses could accumulate to over $400 billion over the next decade (Nilson Report, 2023a). These figures really drive home how big and tricky this problem is. As fraudsters get smarter, using new tech to find and exploit weaknesses, the financial industry is under pressure to develop fraud detection systems (FDS) that are tough, adaptable, and intelligent.
+This report is a piece of a larger project focused on building an advanced system to detect credit card fraud, one that can tackle the many challenges in this area. Our main goal is to use the latest machine learning (ML) methods, like sophisticated ensemble techniques and possibly even graph neural networks, to get really good at spotting fraud. But just being accurate isn't enough. We also know how important it is for these automated systems to be transparent and accountable. That's why a big part of this project is about including Explainable AI (XAI) techniques. We want to be able to understand why the system flags a transaction as fraudulent. This isn't just for meeting regulations or checking our models; it also helps fraud analysts make better, more informed calls.
+On top of that, this project directly takes on two stubborn problems in fraud detection: the fact that fraud cases are rare compared to legitimate transactions (severe class imbalance), and "concept drift," which is when fraud patterns change over time, making old models less effective. By looking into advanced ways to handle imbalanced data and by building in mechanisms for the system to learn and adapt, we're aiming for a system that keeps performing well even as fraudsters change their game. We're also keeping a close eye on the ethical side of things, like data privacy (GDPR) and the risk of our algorithms being biased. These concerns are front and center as we design and test the system.
+This document is a literature review that forms the groundwork for the project. It takes a systematic look at what we currently know about credit card fraud, explores the kinds of datasets we're working with, assesses advanced ML models and techniques for handling data imbalances, discusses how to adapt to changing fraud tactics, explains the role of XAI, considers what makes a good dashboard for fraud analysts, and lays out how we'll measure success. Finally, it touches on the important ethical and legal rules we need to follow. The idea is to bring together existing research, pinpoint best practices, and use all that to sharpen our project's focus and how we plan to approach it.
+2. Literature Review
+
+This review pulls together existing research that's relevant to building a sophisticated credit card fraud detection system. We'll cover how fraud is changing, the characteristics of datasets we might use, the latest machine learning models, ways to deal with imbalanced data and the problem of "concept drift" (when fraud tactics change), the importance of explainable AI, how to design useful dashboards, what metrics to use for evaluation, and the ethical and legal landscape we're operating in.
+2.1 The Shifting Sands: Credit Card Fraud Today
+
+Credit card fraud isn't just a nuisance; it's a growing global problem with serious financial consequences. According to the Nilson Report (2023a), worldwide losses from card fraud were $33.83 billion in 2023, and they predict this could accumulate to over $400 billion over the next ten years. This huge increase really shows that the older, rule-based systems for detecting fraud are struggling to keep up with the increasingly clever tactics fraudsters are using (Chiu and Tsai, 2021).
+The ways fraudsters operate are always changing. "Card-Not-Present" (CNP) fraud – which happens in online, phone, or mail-order transactions – is still a major issue, largely because e-commerce keeps growing (Jurgovsky et al., 2018). Another one is "Synthetic Identity Fraud," where criminals create fake identities using a mix of real and made-up information. These are hard to spot because they can look like legitimate new customers (Financial Crimes Enforcement Network, 2021). Then there's "Account Takeover" (ATO) fraud, where criminals get into real accounts, often through phishing scams or malware, and then use the established trust and credit lines to their advantage (Scaife et al., 2020).
+More recently, we're even seeing AI-powered attacks. Recent reports from the FBI's Internet Crime Complaint Center highlight how criminals are using generative artificial intelligence to facilitate fraud on a larger scale, increasing the believability of their schemes (Federal Bureau of Investigation, 2024). This means fraud detection systems need to be proactive and able to adapt. Some key challenges here are "concept drift" – where the patterns of fraudulent and legitimate transactions change over time, making static models useless (Gama et al., 2014) – and "adversarial attacks," where fraudsters deliberately tweak transaction data to try and fool ML models (Goodfellow, Shlens and Szegedy, 2015).
+2.2 Getting to Grips with the Data: The ULB Kaggle Dataset
+
+Publicly available datasets are incredibly useful for academic research in fraud detection, even if they're often anonymized. The "Credit Card Fraud Detection" dataset on Kaggle, from the Université Libre de Bruxelles (ULB), is a popular dataset for benchmarking (Dal Pozzolo et al., 2014). It contains data from about 285,000 European card transactions made over two days in September 2013. One of its most striking features is the severe class imbalance: fraudulent transactions make up only about 0.17% of all the records (Dal Pozzolo et al., 2015). This tiny fraction of fraud is a big challenge.
+Most of the features in this dataset, named V1 to V28, are the result of Principal Component Analysis (PCA) performed on the original, confidential transaction details. While this anonymization is great for protecting sensitive information, it does limit how much advanced feature engineering we can do, because we don't know what these PCA components actually represent (Whitrow et al., 2009). Because of this, researchers often focus on the features that aren't anonymized: 'Time' (the seconds passed between each transaction and the very first one in the dataset) and 'Amount' (the monetary value of the transaction). Using the 'Time' feature smartly might help us find patterns or regularities in when fraud occurs, while 'Amount' is a pretty direct clue about risk. It might be possible to find more predictive power by looking at how these features interact with each other, and with the PCA components, despite the anonymization (Bhattacharyya et al., 2011).
+2.3 Smarter Defenses: Advanced Machine Learning in Fraud Detection
+
+Traditional machine learning models like logistic regression and decision trees have been used in FDS for a while. But the complexity and the cat-and-mouse nature of modern fraud mean we need more advanced approaches (Abdallah, Maarof and Zainal, 2016).
+Ensemble Methods: Advanced ensemble techniques, especially "stacking," are looking very promising. Stacking basically combines several different learning algorithms to get better predictive performance. You might see models like XGBoost, LightGBM, and CatBoost used as the base learners, with another model (like logistic regression) acting as a "meta-learner" to combine their predictions (Wolpert, 1992; Chen and Guestrin, 2016; Ke et al., 2017; Prokhorenkova et al., 2018). These gradient boosting machines are powerful on their own because they're good at handling complex relationships and reducing errors.
+Graph Neural Networks (GNNs): GNNs are becoming popular because they can model the relationships between different entities in transaction data (like cardholders, merchants, and devices). By thinking of transactions as a graph, GNNs can spot complex fraud rings and collusive behaviors that traditional models, which look at each transaction individually, might miss (Hamilton, Ying and Leskovec, 2017). More advanced versions, like Heterogeneous Graph Neural Networks (HGNNs) that use attention mechanisms and consider how relationships change over time, could be even better (Wang et al., 2019a).
+Transformers: These models were first developed for understanding human language, but their "self-attention mechanisms" are now being tried out for sequential data like transaction histories (Vaswani et al., 2017). The idea is that they might be able to pick up on long-term dependencies and subtle patterns in user behavior that could signal fraud (Li et al., 2020).
+Deep Learning with Attention: Deep neural networks (DNNs), especially when boosted with attention mechanisms, can learn very complex feature representations from high-dimensional transaction data (Bahdanau, Cho and Bengio, 2015). Attention allows the model to dynamically weigh how important different input features or time steps are, helping it focus on the signals that are most indicative of fraud (Zhang et al., 2018).
+2.4 Leveling the Playing Field: Tackling Class Imbalance
+
+The fact that fraud datasets have so few fraudulent transactions compared to legitimate ones is a major hurdle. Standard classifiers tend to get good at spotting the majority class (legitimate transactions) but do a poor job of finding the minority class (fraud) (He and Garcia, 2009).
+Data-Level Techniques: SMOTE (Synthetic Minority Over-sampling Technique) and its variations are pretty common. SMOTE creates new, synthetic examples of the minority class by looking at existing minority instances and interpolating between them (Chawla et al., 2002). There are fancier versions too, like SMOTE-KMEANS, which uses K-Means clustering to help guide where the new synthetic samples are generated; Borderline-SMOTE, which focuses on oversampling minority instances that are close to the boundary between classes (Han, Wang and Mao, 2005); and ADASYN (Adaptive Synthetic Sampling), which creates more synthetic data for minority class examples that the model finds harder to learn (He et al., 2008).
+Algorithm-Level (Ensemble Resampling) Techniques: Ensemble methods can also be tweaked to handle imbalance. For example, a Balanced Random Forest creates balanced bootstrap samples for each tree it builds (Chen, Liaw and Breiman, 2004). SMOTEBoost combines SMOTE with boosting algorithms, oversampling the minority class before each round of boosting (Chawla et al., 2003). RUSBoost (Random Under-Sampling Boost) does the opposite, combining random undersampling of the majority class with boosting (Seiffert et al., 2010).
+Cost-Sensitive Learning: This approach tells the model that some mistakes are worse than others. For instance, misclassifying a fraudulent transaction as legitimate (a false negative) usually costs a lot more than misclassifying a legitimate transaction as fraudulent (a false positive). This can be done by adjusting the weights of different classes in the model's loss function. This is especially relevant for deep learning models, which can use things like weighted cross-entropy or focal loss (Lin et al., 2017). Focal loss, for example, pays less attention to examples the model gets right easily, so it can focus more on the hard, misclassified ones.
+2.5 Keeping Up: Dealing with Concept Drift in Fraud
+
+Fraud patterns don't stay the same; they change as fraudsters find new loopholes and adapt to the detection methods already out there. This is called "concept drift," and it can make FDS much less effective over time (Tsymbal, 2004).
+Adaptive learning systems are key to keeping performance up. An Adaptive Random Forest (ARF) is one example; it's an ensemble that can dynamically change as the data stream changes (Gomes et al., 2017). These systems often include "drift detectors" – algorithms designed to flag when a major shift in the data distribution has happened. Popular drift detection methods include DDM (Drift Detection Method) (Gama et al., 2004) and ADWIN (ADaptive WINdowing) (Bifet and Gavaldà, 2007). There are also frameworks like ROSFD (Resampling Online Streaming Fraud Detection) that combine resampling techniques with adaptive learning and drift detection specifically to handle both class imbalance and concept drift in streaming fraud data (Sousa, Silva and Gama, 2016).
+2.6 Why Did It Do That? The Need for Explainable AI (XAI)
+
+As machine learning models get more complicated (often called "black boxes"), it becomes really important to understand why they make the predictions they do, especially in high-stakes areas like finance (Adadi and Berrada, 2018). XAI is all about making ML models more transparent and interpretable.
+Local and Global Explanations: LIME (Local Interpretable Model-agnostic Explanations) works by explaining individual predictions. It does this by creating a simpler, interpretable model that approximates the behavior of the complex black-box model just for that specific prediction (Ribeiro, Singh and Guestrin, 2016). SHAP (SHapley Additive exPlanations) uses ideas from game theory to give each feature an importance score (a SHAP value) for a particular prediction. This can give us both local (for one prediction) and global (overall model behavior) insights (Lundberg and Lee, 2017). While LIME and SHAP are popular, LIME's explanations can sometimes be a bit unstable (Alvarez-Melis and Jaakkola, 2018), and SHAP can take a long time to compute for large datasets or very complex models (Molnar, 2020).
+Advanced XAI Techniques: Beyond LIME and SHAP, other methods offer deeper understanding. Counterfactual Explanations try to find the smallest change you could make to the input features that would flip the model's prediction (Wachter, Mittelstadt and Russell, 2017). Frameworks like CFTNet or LatentCF++ aim to generate counterfactuals that are not just minimal but also plausible and actionable (Dhurandhar et al., 2018; Mahajan, Tan and Sharma, 2019). Concept-Based Explanations, like those using TCAV (Testing with Concept Activation Vectors), try to explain model decisions using high-level, human-understandable concepts instead of just raw features. However, whether these are feasible can depend on if we can actually define and measure these concepts within our timeframe and with our data (Kim et al., 2018).
+2.7 Seeing is Believing: Dashboards for Fraud Insights and AML
+
+Good data visualization and dashboard design are vital for turning complex model outputs and raw data into something fraud analysts and compliance officers can actually use (Few, 2006). For financial crime, dashboards should help analysts prioritize alerts based on risk scores and how confident the model is, so they can focus on the most critical cases first (Dilla, Janvrin and Raschke, 2010).
+It's really important to include XAI outputs in these dashboards. They should show things like feature importance scores (from SHAP, for example) or local explanations (from LIME) right next to the predictions. This helps analysts understand why an alert was triggered (Krause, Perer and Bertini, 2018). Visualizations that help with Anti-Money Laundering (AML) insights are also very useful. For instance, transaction risk timelines can show how an entity's risk profile changes over time. Sankey diagrams showing feature importance can illustrate how different features contribute to overall risk scores for different groups. If we're using GNNs, network graphs that visualize connections between suspicious entities could help uncover fraud rings or money laundering schemes (van den Elzen and van Wijk, 2011). When it comes to building these dashboards, tools like Plotly Dash are often a good choice because they integrate well with Python, making it easier to quickly develop interactive visualizations straight from the ML workflows (Plotly Technologies Inc., 2023).
+2.8 How Do We Know It's Working? Evaluating Fraud Detection Systems
+
+Because fraud datasets are so imbalanced, just looking at overall accuracy can be very misleading. We need more suitable metrics:
+    • Precision: Out of all the transactions our model flagged as fraud, what proportion were actually fraud? Precision = TP / (TP + FP)
+    • Recall (Sensitivity): Out of all the actual fraudulent transactions, what proportion did our model correctly identify? Recall = TP / (TP + FN)
+    • F1-score: This is the harmonic mean of Precision and Recall, giving a balanced view between the two. F1-score = 2 * (Precision * Recall) / (Precision + Recall)
+    • ROC-AUC (Area Under the Receiver Operating Characteristic Curve): This measures the trade-off between the true positive rate (Recall) and the false positive rate at different decision thresholds. It's popular, but it can sometimes give an overly optimistic picture for highly imbalanced datasets (Fawcett, 2006).
+    • Average Precision (PR-AUC or AP): This is the area under the Precision-Recall curve. It's generally considered more informative than ROC-AUC when dealing with imbalanced classification tasks because it focuses more on how well the model performs on the minority (fraud) class (Davis and Goadrich, 2006; Boyd, Mandayam and Recht, 2012).
+For a more advanced evaluation, especially if we want to think about the business impact, we can use cost-benefit analysis frameworks. These involve assigning monetary costs to false positives (e.g., annoying a customer, investigation time) and false negatives (e.g., the actual fraud loss) to see how economically useful a model is (Hand, 2009). The H-measure is another metric that takes into account the distribution of misclassification costs, offering a more subtle assessment of performance than traditional metrics when costs are uncertain (Hand, 2009).
+2.9 Doing the Right Thing: Ethics and Law in AI Fraud Detection
+
+Using AI to detect fraud comes with some serious ethical and legal responsibilities.
+Data Privacy and GDPR: The General Data Protection Regulation (GDPR) in Europe, and similar laws elsewhere, have strict rules about how personal data is handled (European Parliament and Council of the European Union, 2016). Transparency is a big one, and this is where XAI can help by giving insight into how decisions are made. Data minimization – making sure we only collect and use the data we absolutely need – is also crucial.
+Bias Detection and Mitigation: ML models can accidentally learn and even amplify biases that are present in historical data. This could lead to unfair or discriminatory outcomes for certain groups of people (Mehrabi et al., 2021). It's vital to have methods for spotting bias in our training data and in the model's predictions (like disparate impact analysis) and to use techniques to reduce it. This might involve pre-processing the data, making adjustments to the algorithm during training, or post-processing the model's outputs (Bellamy et al., 2019).
+AML Guidelines: Anti-Money Laundering guidelines, like those from the Financial Action Task Force (FATF), are increasingly talking about the use of AI. FATF recommendations stress that AI systems need to be explainable, auditable, and governed by solid risk management practices (FATF, 2021). When we design our system, we have to keep these guidelines in mind to make sure we're compliant and using AI responsibly.
+This thorough look at the existing literature gives us a solid base for the next steps in our project. It will help us choose the right methods and design a fraud detection system that is robust, explainable, and ethically sound.
+
+3. References
+
+    1. Abdallah, A., Maarof, M.A. and Zainal, A. (2016) 'Fraud detection system: A survey', Journal of Network and Computer Applications, 68, pp. 90-113. [Online] Available at: https://doi.org/10.1016/j.jnca.2016.04.007 
+    2. Adadi, A. and Berrada, M. (2018) 'Peeking Inside the Black-Box: A Survey on Explainable Artificial Intelligence (XAI)', IEEE Access, 6, pp. 52138-52160. [Online] Available at: https://doi.org/10.1109/ACCESS.2018.2870052 
+    3. Alvarez-Melis, D. and Jaakkola, T.S. (2018) 'On the Robustness of Interpretability Methods', ICML Workshop on Human Interpretability in Machine Learning (WHI). [Online] Available at: https://arxiv.org/abs/1806.08049 
+    4. Anderson, R. (2022) Security Engineering: A Guide to Building Dependable Distributed Systems. 3rd edn. Wiley. [Online] Available at: https://www.wiley.com/en-us/Security+Engineering%3A+A+Guide+to+Building+Dependable+Distributed+Systems%2C+3rd+Edition-p-9781119642817 
+    5. Bahdanau, D., Cho, K. and Bengio, Y. (2015) 'Neural Machine Translation by Jointly Learning to Align and Translate', Proceedings of the 3rd International Conference on Learning Representations (ICLR). [Online] Available at: https://arxiv.org/abs/1409.0473 
+    6. Bellamy, R.K.E., Dey, K., Hind, M., Hoffman, S.C., Houde, S., Kannan, K., Lohia, P., Martino, J., Mehta, S., Mojsilović, A., Nagar, S., Ramamurthy, K.N., Richards, J., Saha, D., Sattigeri, P., Singh, M., Varshney, K.R. and Zhang, Y. (2019) 'AI Fairness 360: An Extensible Toolkit for Detecting, Understanding, and Mitigating Unwanted Algorithmic Bias', IBM Journal of Research and Development, 63(4/5), pp. 4:1-4:15. [Online] Available at: https://doi.org/10.1147/JRD.2019.2942287 
+    7. Bhattacharyya, S., Jha, S., Tharakunnel, K. and Westland, J.C. (2011) 'Data mining for credit card fraud: A comparative study', Decision Support Systems, 50(3), pp. 602-613. [Online] Available at: https://doi.org/10.1016/j.dss.2010.12.008 
+    8. Bifet, A. and Gavaldà, R. (2007) 'Learning from Time-Changing Data with Adaptive Windowing', Proceedings of the 7th SIAM International Conference on Data Mining (SDM), pp. 443-448. [Online] Available at: https://doi.org/10.1137/1.9781611972771.40 
+    9. Boyd, K., Mandayam, C. and Recht, B. (2012) 'A C.I.A. Approach to Performance Evaluation in Machine Learning', arXiv preprint arXiv:1206.3858. [Online] Available at: https://arxiv.org/abs/1206.3858 
+    10. Chawla, N.V., Bowyer, K.W., Hall, L.O. and Kegelmeyer, W.P. (2002) 'SMOTE: Synthetic Minority Over-sampling Technique', Journal of Artificial Intelligence Research, 16, pp. 321-357. [Online] Available at: https://doi.org/10.1613/jair.953 
+    11. Chawla, N.V., Lazarevic, A., Hall, L.O. and Bowyer, K.W. (2003) 'SMOTEBoost: Improving Prediction of the Minority Class in Boosting', Proceedings of the 7th European Conference on Principles and Practice of Knowledge Discovery in Databases (PKDD), pp. 107-119. [Online] Available at: https://doi.org/10.1007/978-3-540-39804-2_12 
+    12. Chen, C., Liaw, A. and Breiman, L. (2004) 'Using random forest to learn imbalanced data', University of California, Berkeley, Tech. Rep, 666. [Online] Available at: https://statistics.berkeley.edu/sites/default/files/tech-reports/666.pdf 
+    13. Chen, T. and Guestrin, C. (2016) 'XGBoost: A Scalable Tree Boosting System', Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, pp. 785-794. [Online] Available at: https://doi.org/10.1145/2939672.2939785 
+    14. Chiu, C.C. and Tsai, C.Y. (2021) 'A review of financial fraud detection techniques: 2010–2020', Journal of Financial Crime, 28(4), pp. 990-1011. [Online] Available at: https://doi.org/10.1108/JFC-12-2020-0245 
+    15. Dal Pozzolo, A., Caelen, O., Le Borgne, Y.A., Waterschoot, S. and Bontempi, G. (2014) 'Learned lessons in credit card fraud detection from a practitioner perspective', Expert Systems with Applications, 41(10), pp. 4915-4928. [Online] Available at: https://doi.org/10.1016/j.eswa.2014.02.026 
+    16. Dal Pozzolo, A., Boracchi, G., Caelen, O., Alippi, C. and Bontempi, G. (2015) 'Credit card fraud detection: a realistic modeling and a novel learning strategy', IEEE Transactions on Neural Networks and Learning Systems, 29(8), pp. 3784-3797. [Online] Available at: https://doi.org/10.1109/TNNLS.2017.2736643 
+    17. Davis, J. and Goadrich, M. (2006) 'The Relationship Between Precision-Recall and ROC Curves', Proceedings of the 23rd International Conference on Machine Learning (ICML), pp. 233-240. [Online] Available at: https://doi.org/10.1145/1143844.1143874 
+    18. Dhurandhar, A., Chen, P.Y., Luss, R., Tu, C.C., Ting, P., Shanmugam, K. and Das, P. (2018) 'Explanations based on the Missing: Towards Contrastive Explanations with Pertinent Negatives', Advances in Neural Information Processing Systems 31 (NeurIPS). [Online] Available at: https://arxiv.org/abs/1802.07683 
+    19. Dilla, W.N., Janvrin, D.J. and Raschke, R.L. (2010) 'Interactive data visualization: A tool for accountants', Journal of Accountancy, 209(2), p. 32. [Online] Available at: https://www.journalofaccountancy.com/issues/2010/feb/20092123.html 
+    20. European Parliament and Council of the European Union (2016) 'Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation)', Official Journal of the European Union, L119/1. [Online] Available at: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex%3A32016R0679 
+    21. FATF (Financial Action Task Force) (2021) Opportunities and Challenges of New Technologies for AML/CFT. FATF, Paris. [Online] Available at: https://www.fatf-gafi.org/publications/fatfrecommendations/documents/opportunities-challenges-new-technologies-aml-cft.html 
+    22. Fawcett, T. (2006) 'An introduction to ROC analysis', Pattern Recognition Letters, 27(8), pp. 861-874. [Online] Available at: https://doi.org/10.1016/j.patrec.2005.10.010  
+    23. Federal Bureau of Investigation (2024) 'Criminals Use Generative Artificial Intelligence to Facilitate Financial Fraud', Internet Crime Complaint Center Alert Number I-120324-PSA. [Online] Available at: https://www.ic3.gov/Media/Y2024/PSA240103 
+    24. Few, S. (2006) Information Dashboard Design: The Effective Visual Communication of Data. O'Reilly Media. [Online] Available at: https://www.oreilly.com/library/view/information-dashboard-design/0596100167/ 
+    25. Financial Crimes Enforcement Network (2021) Advisory on Synthetic Identity Fraud. FIN-2021-A004. [Online] Available at: https://www.fincen.gov/sites/default/files/2021-09/Advisory_Synthetic_Identity_Fraud_508.pdf 
+    26. Gama, J., Medas, P., Castillo, G. and Rodrigues, P. (2004) 'Learning with Drift Detection', Proceedings of the 17th Brazilian Symposium on Artificial Intelligence (SBIA), pp. 286-295. [Online] Available at: https://doi.org/10.1007/978-3-540-28645-5_29 
+    27. Gama, J., Žliobaitė, I., Bifet, A., Pechenizkiy, M. and Bouchachia, A. (2014) 'A survey on concept drift adaptation', ACM Computing Surveys (CSUR), 46(4), pp. 1-37. [Online] Available at: https://doi.org/10.1145/2523813 
+    28. Gomes, H.M., Bifet, A., Read, J., Barddal, J.P., Enembreck, F., Pfharinger, B., Holmes, G. and Abdessalem, T. (2017) 'Adaptive random forests for evolving data stream classification', Machine Learning, 106(9-10), pp. 1469-1495. [Online] Available at: https://doi.org/10.1007/s10994-017-5642-8 
+    29. Goodfellow, I.J., Shlens, J. and Szegedy, C. (2015) 'Explaining and Harnessing  Adversarial Examples', Proceedings of the 3rd International Conference on Learning Representations (ICLR). [Online] Available at: https://arxiv.org/abs/1412.6572 
+    30. Hamilton, W.L., Ying, R. and Leskovec, J. (2017) 'Inductive Representation Learning on Large Graphs', Advances in Neural Information Processing Systems 30 (NIPS). [Online] Available at: https://arxiv.org/abs/1706.02216 
+    31. Han, H., Wang, W.Y. and Mao, B.H. (2005) 'Borderline-SMOTE: A New Over-Sampling Method in Imbalanced Data Sets Learning', Advances in Intelligent Computing, pp. 878-887. [Online] Available at: https://doi.org/10.1007/11538059_91 
+    32. Hand, D.J. (2009) 'Measuring classifier performance: a coherent alternative to the area under the ROC curve', Machine Learning, 77(1), pp. 103-123. [Online] Available at: https://doi.org/10.1007/s10994-009-5119-5 
+    33. He, H. and Garcia, E.A. (2009) 'Learning from Imbalanced Data', IEEE Transactions on Knowledge and Data Engineering, 21(9), pp. 1263-1284. [Online] Available at: https://doi.org/10.1109/TKDE.2008.239 
+    34. He, H., Bai, Y., Garcia, E.A. and Li, S. (2008) 'ADASYN: Adaptive synthetic sampling approach for imbalanced learning', IEEE International Joint Conference on Neural Networks (IJCNN 2008), pp. 1322-1328. [Online] Available at: https://doi.org/10.1109/IJCNN.2008.4633969 
+    35. Jurgovsky, J., Granitzer, M., Ziegler, K., Pripfl, J., Tjoa, A.M. and Kieseberg, P. (2018) 'A survey on card-not-present fraud', Computers & Security, 77, pp. 671-693. [Online] Available at: https://doi.org/10.1016/j.cose.2018.04.004 
+    36. Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., Ye, Q. and Liu, T.Y. (2017) 'LightGBM: A Highly Efficient Gradient Boosting Decision Tree', Advances in Neural Information Processing Systems 30 (NIPS). [Online] Available at: https://proceedings.neurips.cc/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html 
+    37. Kim, B., Wattenberg, M., Gilmer, J., Cai, C., Wexler, J., Viegas, F. and Sayres, R. (2018) 'Interpretability Beyond Feature Attribution: Quantitative Testing with Concept Activation Vectors (TCAV)', Proceedings of the 35th International Conference on Machine Learning (ICML). [Online] Available at: https://arxiv.org/abs/1711.11279 
+    38. Krause, J., Perer, A. and Bertini, E. (2018) 'Using Visual Analytics to Interpret Predictive Machine Learning Models', arXiv preprint arXiv:1606.05685. [Online] Available at: https://arxiv.org/abs/1606.05685 
+    39. Li, S., Jin, X., Xuan, Y., Zhou, X., Chen, W., Wang, Y.X. and Yan, X. (2020) 'Enhancing the Locality and Breaking the Memory Bottleneck of Transformer on Time Series Forecasting', Advances in Neural Information Processing Systems 33 (NeurIPS). [Online] Available at: https://proceedings.neurips.cc/paper/2019/hash/6775a76869769941135349e54a5573ad-Abstract.html 
+    40. Lin, T.Y., Goyal, P., Girshick, R., He, K. and Dollár, P. (2017) 'Focal Loss for Dense Object Detection', Proceedings of the IEEE International Conference on Computer Vision (ICCV), pp. 2980-2988. [Online] Available at: https://arxiv.org/abs/1708.02002 
+    41. Lundberg, S.M. and Lee, S.I. (2017) 'A Unified Approach to Interpreting Model Predictions', Advances in Neural Information Processing Systems 30 (NIPS). [Online] Available at: https://arxiv.org/abs/1705.07874 
+    42. Mahajan, D., Tan, C. and Sharma, A. (2019) 'Preserving Causal Constraints in Counterfactual Explanations for Machine Learning Classifiers', arXiv preprint arXiv:1912.03277. [Online] Available at: https://arxiv.org/abs/1912.03277 
+    43. Mehrabi, N., Morstatter, F., Saxena, N., Lerman, K. and Galstyan, A. (2021) 'A Survey on Bias and Fairness in Machine Learning', ACM Computing Surveys, 54(6), pp. 1-35. [Online] Available at: https://doi.org/10.1145/3457607 
+    44. Molnar, C. (2020) Interpretable Machine Learning: A Guide for Making Black Box Models Explainable. [Online] Available at: https://christophm.github.io/interpretable-ml-book/ 
+    45.  Nilson Report (2023a) 'Card Fraud Losses Worldwide in 2023', Issue 1330, December 2023. [Online] Available at: https://nilsonreport.com/mention/439/1link/ 
+    46. Plotly Technologies Inc. (2023) Collaborative data science. [Online] Available at: https://plotly.com/ 
+    47. Prokhorenkova, L., Gusev, G., Vorobev, A., Dorogush, A.V. and Gulin, A. (2018) 'CatBoost: unbiased boosting with categorical features', Advances in Neural Information Processing Systems 31 (NeurIPS). [Online] Available at: https://arxiv.org/abs/1706.09516 
+    48. Ribeiro, M.T., Singh, S. and Guestrin, C. (2016) '"Why Should I Trust You?": Explaining the Predictions of Any Classifier', Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, pp. 1135-1144. [Online] Available at: https://doi.org/10.1145/2939672.2939778 
+    49. Scaife, N., Carter, H., Traynor, P. and Butler, K.R. (2020) 'CryptoLock (and Drop It): Stopping Ransomware Attacks on User Data', Proceedings of the 36th International Conference on Distributed Computing Systems (ICDCS). [Online] Available at: https://doi.org/10.1109/ICDCS.2016.32 
+    50. Seiffert, C., Khoshgoftaar, T.M., Van Hulse, J. and Napolitano, A. (2010) 'RUSBoost: A  Hybrid Approach to Alleviating Class Imbalance', IEEE Transactions on Systems, Man, and Cybernetics-Part A: Systems and Humans, 40(1), pp. 185-197. [Online] Available at: https://doi.org/10.1109/TSMCA.2009.2029559 
+    51. Sousa, R., Silva, A. and Gama, J. (2016) 'Online Learning for Credit Card Fraud Detection', International Conference on Discovery Science, pp. 289-305. [Online] Available at: https://doi.org/10.1007/978-3-319-46307-0_18 
+    52. Tsymbal, A. (2004) 'The problem of concept drift: definitions and related work', Computer Science Department, Trinity College Dublin, Technical Report TCD-CS-2004-15. [Online] Available at: https://www.tara.tcd.ie/handle/2262/8514 
+    53. van den Elzen, S. and van Wijk, J.J. (2011) 'BaobabView: Interactive construction and analysis of decision trees', IEEE Conference on Visual Analytics Science and Technology (VAST), pp. 151-160. [Online] Available at: https://doi.org/10.1109/VAST.2011.6102453 
+    54. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, Ł. and Polosukhin, I. (2017) 'Attention is All you Need', Advances in Neural Information Processing Systems 30 (NIPS). [Online] Available at: https://arxiv.org/abs/1706.03762 
+    55. Wachter, S., Mittelstadt, B. and Russell, C. (2017) 'Counterfactual Explanations Without Opening the Black Box: Automated Decisions and the GDPR', Harvard Journal of Law & Technology, 31(2), pp. 841-887. [Online] Available at: https://jolt.law.harvard.edu/assets/article-pdfs/v31/31-Harv.-J.L.-Tech.-841.pdf 
+    56. Wang, X., Ji, H., Shi, C., Wang, B., Ye, Y., Cui, P. and Yu, P.S. (2019a) 'Heterogeneous Graph Attention Network', The World Wide Web Conference, pp. 2022-2032. [Online] Available at: https://doi.org/10.1145/3308558.3313562 
+    57. Whitrow, C., Hand, D.J., Juszczak, P., Weston, D. and Adams, N.M. (2009) 'Transaction aggregation as a strategy for credit card fraud detection', Data Mining and Knowledge Discovery, 18(1), pp. 30-55. [Online] Available at: https://doi.org/10.1007/s10618-008-0116-z 
+    58. Wolpert, D.H. (1992) 'Stacked generalization', Neural Networks, 5(2), pp. 241-259. [Online] Available at: https://doi.org/10.1016/S0893-6080(05)80023-1 
+    59. Zhang, L., Wang, S. and Liu, B. (2018) 'Deep learning for sentiment analysis: A survey', Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 8(4), e1253. [Online] Available at: https://doi.org/10.1002/widm.1253 

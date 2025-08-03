@@ -1,0 +1,18 @@
+{
+  "model_name": "random_forest_mapper",
+  "is_trained": true,
+  "training_config": {},
+  "metadata": {
+    "model_name": "random_forest_mapper",
+    "model_type": "random_forest",
+    "version": "1.0",
+    "training_date": "2025-08-03 23:34:28",
+    "performance_metrics": {
+      "training_score": 0.6801407571289341,
+      "training_time_seconds": 7.334153652191162,
+      "n_samples": 3500,
+      "n_features": 8
+    },
+    "feature_importance": null
+  }
+}

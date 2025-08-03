@@ -22,9 +22,11 @@ def create_app():
     from app.routes.api_routes import api_bp
     from app.routes.mlops_routes import mlops_bp
     from app.routes.documentation_routes import documentation_bp
+    from app.routes.intelligent_prediction_routes import intelligent_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(prediction_bp, url_prefix='/predict')
+    app.register_blueprint(intelligent_bp, url_prefix='/intelligent')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(mlops_bp, url_prefix='/mlops')

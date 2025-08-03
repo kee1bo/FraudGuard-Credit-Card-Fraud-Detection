@@ -1,0 +1,66 @@
+MSc Data Science Project Proposal
+Credit-Card Fraud Detection with Explainable ML and Dashboards
+Topic Area: Fraud Detection / Credit Card Security / AML
+ Keywords: Credit Card Fraud, Machine Learning, Explainable AI, Dashboard, Anomaly Detection, AML Insights
+ MSc Modules Studied: Applied Machine Learning; Data Visualization; Technologies for Anti-Money Laundering and Financial Crime
+1. Overview
+Credit card fraud represents a significant financial crime, with global economic costs in the trillions annually. Real-time detection of fraudulent transactions presents several challenges, primarily due to severe class imbalance and evolving fraudulent patterns. This project aims to implement supervised machine learning techniques using a publicly available credit card transaction dataset (specifically the ULB Kaggle dataset) to classify transactions as either fraudulent or legitimate.
+A central focus of this project is explainability - utilizing interpretable models and post-hoc explanation techniques (LIME and SHAP) to provide transparency into model predictions. The project will further integrate these models into an interactive dashboard (using Plotly Dash or Tableau) that visualizes transaction risks along with their explanations. This approach connects Applied ML and Data Visualization skills with AML themes by delivering an actionable tool that identifies high-risk transactions with clear reasoning.
+The project scope is realistic for a 10-12 week timeframe, utilizing the Kaggle dataset (approximately 285,000 records with 0.17% fraudulent transactions) and open-source ML libraries. The final deliverable will be a prototype fraud detection system featuring interpretable outputs.
+2. Objectives
+2.1 Literature Review on Fraud Detection and Explainability
+    • Activities: Conduct a survey of recent research on credit card fraud detection, imbalanced learning, and explainable AI applications in finance. Identify best practices for model selection and explanation techniques.
+    • Deliverables: A concise literature review summarizing key models (random forests, ensemble methods) and XAI approaches (LIME/SHAP).
+2.2 Data Acquisition and Preprocessing
+    • Activities: Obtain the Kaggle ULB credit card dataset. Implement data cleaning and preprocessing (handle scaling, encode categorical variables if present). Address class imbalance through resampling or weighting techniques.
+    • Deliverables: Preprocessed dataset ready for modeling (with accompanying code). A comprehensive data description report including statistics and imbalance ratio.
+2.3 Model Development and Evaluation
+    • Activities: Implement and compare multiple supervised classifiers (logistic regression, decision trees, random forest, gradient boosting) using scikit-learn or TensorFlow. Employ stratified cross-validation and metrics appropriate for imbalanced datasets (precision, recall, F1, ROC-AUC). Optimize hyperparameters via grid search or similar techniques.
+    • Deliverables: Well-documented code with results summary (performance tables/plots). A detailed chapter explaining model selection and quantitative evaluation.
+2.4 Explainability Integration
+    • Activities: Apply model-agnostic explanation techniques (SHAP, LIME) to interpret the predictions of trained models. Generate feature importance visualizations and exemplar case studies explaining why specific transactions were flagged.
+    • Deliverables: Analysis of explanations (charts, example reports) demonstrating key features that influence fraud detection. A supplementary notebook with explanation code and outputs.
+2.5 Dashboard Development
+    • Activities: Design and develop an interactive dashboard to present results to users utilizing Plotly Dash, Streamlit, or Tableau Public. The dashboard will display summary fraud metrics, transaction visualizations, and allow detailed exploration of flagged cases with explanation pop-ups.
+    • Deliverables: A functional prototype dashboard (code or link) that visualizes model outputs and explanations in real-time. Documentation on dashboard design choices and usage instructions.
+2.6 Reporting and Validation
+    • Activities: Validate the system using held-out data and potentially on a simulated transaction stream. Iterate on models and dashboard based on feedback. Prepare the final report and presentation.
+    • Deliverables: Final project report with methodology, experiments, and discussion chapters, including a project plan appendix. Presentation slides demonstrating the fraud detection system and key insights.
+3. Legal, Social and Ethical Issues
+This project utilizes anonymized public transaction data, which mitigates direct privacy concerns. Nevertheless, adherence to data protection regulations (GDPR) is essential by ensuring transparency: users of the system will be informed about the automated decision-making logic employed. The explainable AI component addresses ethical considerations by providing "meaningful information" regarding model logic.
+From a social perspective, the system must minimize false positive rates to prevent unjustified flagging of legitimate customers. The project will address potential biases (e.g., if certain customer demographics are overrepresented) and ensure compliance with AML guidelines. No health or safety issues are anticipated. As the dataset is public and anonymized, no additional ethical approvals are required, though the project will maintain confidentiality regarding any sensitive patterns discovered.
+4. Resources
+Required resources include:
+    • Kaggle credit-card fraud dataset
+    • Computing hardware (personal laptop or university lab computers with Python/MATLAB)
+    • Software libraries (scikit-learn, TensorFlow/Keras, SHAP/LIME packages, visualization tools like Plotly or Tableau)
+    • Academic literature on fraud detection and XAI accessed through university library subscriptions
+    • Faculty supervision from an expert in AML and ML
+No specialized permits are needed. The time allocation is estimated at 10-15 hours weekly. All software utilized will be either open-source or covered by university licenses.
+5. Critical Success Factors
+Key success factors include:
+    • Availability of high-quality data (the Kaggle dataset has proven reliability)
+    • Effective management of class imbalance through resampling or anomaly detection techniques
+    • Achievement of robust model performance metrics (high recall with acceptable precision on fraud cases)
+The explainability component must generate clear, actionable insights; if the model remains opaque, the project's value diminishes significantly. Therefore, successful implementation and validation of SHAP/LIME techniques is critical. The dashboard must demonstrate user-friendliness, requiring thoughtful design and thorough testing.
+Potential risks include time management challenges (complex models and dashboard development could be time-intensive) and overfitting. Mitigation strategies include beginning with simple models, iterative refinement, and rigorous validation.
+6. Schedule
+    • Weeks 1-2: Literature review; dataset acquisition finalization; initial data exploration
+    • Weeks 3-4: Data preprocessing (cleaning, feature engineering); baseline model implementation (logistic regression, decision trees)
+    • Weeks 5-6: Advanced model development (random forest, XGBoost) and tuning; evaluation and addressing class imbalance (SMOTE or class weights)
+    • Weeks 7-8: Explainability integration (SHAP/LIME); feature importance analysis and case studies
+    • Weeks 9-10: Interactive dashboard development for results visualization; UI design and testing
+    • Week 11: System validation with test data; experiment finalization; report drafting
+    • Week 12: Review, documentation and presentation finalization; buffer for contingencies
+7. References
+Florentin, D. and Jansen, R. (2025) 'AI Powered Credit Card Fraud Detection by Using Ensemble Method of Machine Learning', International Journal of Scientific Research in Computer Science, Engineering and Information Technology, 11, pp. 1255-1264.
+Psychoula, I., Barthe-Delanoë, A. and Ahmad, A. (2021) 'Explainable Machine Learning for Fraud Detection', arXiv preprint arXiv:2105.06314.
+ULB Machine Learning Group (2013) Credit Card Fraud Detection Dataset. Available at: https://www.kaggle.com/mlg-ulb/creditcardfraud (Accessed: 1 May 2025).
+Vijayakumar, V., Priyadharshini, N. and Raamakirtinan, B. (2020) 'Isolation Forest and Local Outlier Factor for Credit Card Fraud Detection', International Journal of Engineering and Advanced Technology, 9(4), pp. 261-265.
+
+
+
+
+
+
+
