@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - FraudGuard AI{% endblock %}
+
+{% block head %}
+<style>
+/* Professional Report Styling */
+.report-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: var(--shadow-lg);
+    min-height: 100vh;
+}
+
+.report-header {
+    background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);
+    color: white;
+    padding: var(--space-12) var(--space-8);
+    text-align: center;
+}
+
+.report-title {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.025em;
+}
+
+.report-subtitle {
+    font-size: var(--text-lg);
+    opacity: 0.9;
+    margin-bottom: var(--space-2);
+}
+
+.report-meta {
+    font-size: var(--text-sm);
+    opacity: 0.8;
+    margin-top: var(--space-4);
+}
+
+.report-nav {
+    background: var(--color-neutral-50);
+    border-bottom: 1px solid var(--color-neutral-200);
+    padding: var(--space-4) var(--space-8);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.report-nav-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.report-actions {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.report-btn {
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-primary-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.report-btn:hover {
+    background: var(--color-primary-700);
+    transform: translateY(-1px);
+    color: white;
+    text-decoration: none;
+}
+
+.report-btn.secondary {
+    background: var(--color-neutral-600);
+}
+
+.report-btn.secondary:hover {
+    background: var(--color-neutral-700);
+}
+
+.report-content {
+    padding: var(--space-8);
+    line-height: var(--leading-relaxed);
+    font-size: var(--text-base);
+    color: var(--color-neutral-700);
+}
+
+/* Table of Contents */
+.toc-container {
+    background: var(--color-neutral-50);
+    border: 1px solid var(--color-neutral-200);
+    border-left: 4px solid var(--color-primary-600);
+    border-radius: var(--radius-none);
+    padding: var(--space-6);
+    margin: var(--space-8) 0;
+}
+
+.toc-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.toc-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.toc-content li {
+    margin-bottom: var(--space-2);
+}
+
+.toc-content a {
+    color: var(--color-primary-600);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.toc-content a:hover {
+    color: var(--color-primary-800);
+    text-decoration: underline;
+}
+
+/* Professional Typography */
+.report-content h1 {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-neutral-900);
+    margin: var(--space-12) 0 var(--space-6) 0;
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--color-primary-600);
+}
+
+.report-content h2 {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+    margin: var(--space-10) 0 var(--space-4) 0;
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-neutral-300);
+}
+
+.report-content h3 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+    margin: var(--space-8) 0 var(--space-3) 0;
+}
+
+.report-content h4 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-neutral-700);
+    margin: var(--space-6) 0 var(--space-2) 0;
+}
+
+.report-content p {
+    margin-bottom: var(--space-4);
+    text-align: justify;
+}
+
+.report-content ul, .report-content ol {
+    margin: var(--space-4) 0;
+    padding-left: var(--space-6);
+}
+
+.report-content li {
+    margin-bottom: var(--space-2);
+}
+
+.report-content blockquote {
+    border-left: 4px solid var(--color-primary-600);
+    background: var(--color-primary-50);
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-6) 0;
+    font-style: italic;
+    border-radius: var(--radius-none);
+}
+
+.report-content code {
+    background: var(--color-neutral-100);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: var(--text-sm);
+    color: var(--color-danger-600);
+}
+
+.report-content pre {
+    background: var(--color-neutral-900);
+    color: var(--color-neutral-100);
+    padding: var(--space-6);
+    border-radius: var(--radius-none);
+    overflow-x: auto;
+    margin: var(--space-6) 0;
+    border-left: 4px solid var(--color-primary-600);
+}
+
+.report-content pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+
+/* Professional Tables */
+.report-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-6) 0;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-none);
+    overflow: hidden;
+}
+
+.report-content th {
+    background: var(--color-primary-600);
+    color: white;
+    font-weight: 600;
+    text-align: left;
+    padding: var(--space-4);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.report-content td {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-neutral-200);
+    vertical-align: top;
+}
+
+.report-content tr:nth-child(even) {
+    background: var(--color-neutral-50);
+}
+
+.report-content tr:hover {
+    background: var(--color-primary-50);
+}
+
+/* Academic Citations */
+.citation {
+    font-size: var(--text-sm);
+    color: var(--color-neutral-500);
+    font-style: italic;
+}
+
+.footnote {
+    font-size: var(--text-xs);
+    color: var(--color-neutral-500);
+    border-top: 1px solid var(--color-neutral-300);
+    padding-top: var(--space-4);
+    margin-top: var(--space-8);
+}
+
+/* Print Styles */
+@media print {
+    .report-nav,
+    .report-actions {
+        display: none !important;
+    }
+    
+    .report-container {
+        box-shadow: none !important;
+        margin: 0 !important;
+        max-width: none !important;
+    }
+    
+    .report-content {
+        font-size: 11pt !important;
+        line-height: 1.4 !important;
+    }
+    
+    .report-content h1 {
+        page-break-before: always;
+    }
+    
+    .report-content h1:first-child {
+        page-break-before: avoid;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .report-container {
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    .report-header {
+        padding: var(--space-8) var(--space-4);
+    }
+    
+    .report-title {
+        font-size: var(--text-2xl);
+    }
+    
+    .report-content {
+        padding: var(--space-4);
+    }
+    
+    .report-nav-content {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .report-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <!-- Report Header -->
+    <div class="report-header">
+        <h1 class="report-title">{{ title }}</h1>
+        {% if metadata.subtitle %}
+        <p class="report-subtitle">{{ metadata.subtitle[0] }}</p>
+        {% endif %}
+        <div class="report-meta">
+            {% if metadata.author %}
+            <div>{{ metadata.author[0] }}</div>
+            {% endif %}
+            <div>Generated on {{ generated_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="report-nav">
+        <div class="report-nav-content">
+            <div class="breadcrumb">
+                <a href="/" class="text-primary">Home</a> / 
+                <span class="text-neutral-600">Professional Report</span>
+            </div>
+            <div class="report-actions">
+                <button onclick="window.print()" class="report-btn">
+                    <i data-lucide="printer"></i> Print PDF
+                </button>
+                <a href="#" onclick="downloadReport()" class="report-btn secondary">
+                    <i data-lucide="download"></i> Download
+                </a>
+                <a href="/" class="report-btn secondary">
+                    <i data-lucide="arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    {% if toc %}
+    <div class="report-content">
+        <div class="toc-container">
+            <h2 class="toc-title">
+                <i data-lucide="list"></i>
+                Table of Contents
+            </h2>
+            <div class="toc-content">
+                {{ toc | safe }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="report-content">
+        {{ content | safe }}
+    </div>
+</div>
+
+<script>
+function downloadReport() {
+    // Create a blob with the HTML content
+    const reportContent = document.querySelector('.report-container').outerHTML;
+    const blob = new Blob([reportContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '{{ title | replace(" ", "_") }}_Report.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Initialize Lucide icons
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+});
+</script>
+{% endblock %}

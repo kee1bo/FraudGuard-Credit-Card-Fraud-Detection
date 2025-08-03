@@ -7,237 +7,226 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow">
-                <div class="card-header bg-primary text-white">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h4 class="mb-0"><i class="fas fa-tachometer-alt"></i> Model Performance Dashboard</h4>
-                            <small>Compare and analyze fraud detection models</small>
+<div class="container-fluid py-6">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header mb-8">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="dashboard-title">Model Performance Dashboard</h1>
+                <p class="dashboard-subtitle">Compare and analyze fraud detection models</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-outline-primary" id="refreshDashboard">
+                    <i data-lucide="refresh-cw"></i> Refresh Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Controls -->
+    <div class="dashboard-controls card mb-6">
+        <div class="card-body">
+            {% if models and models|length > 0 %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="modelSelector" class="form-label">Select Model</label>
+                            <select class="form-control" id="modelSelector">
+                                <option value="">Choose a model...</option>
+                                {% for model in models %}
+                                    <option value="{{ model }}">{{ model.replace('_', ' ').title() }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-light btn-sm" id="refreshDashboard">
-                                <i class="fas fa-sync-alt"></i> Refresh
-                            </button>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="comparisonMode" class="form-label">View Mode</label>
+                            <select class="form-control" id="comparisonMode">
+                                <option value="single">Single Model Analysis</option>
+                                <option value="comparison">Compare All Models</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Export Options</label>
+                            <div class="btn-group w-100">
+                                <button class="btn btn-outline-primary" id="exportPDF">
+                                    <i data-lucide="file-text"></i> PDF
+                                </button>
+                                <button class="btn btn-outline-primary" id="exportExcel">
+                                    <i data-lucide="download"></i> Excel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    {% if models and models|length > 0 %}
-                        <!-- Model Selector -->
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <label for="modelSelector" class="form-label fw-bold">Select Model:</label>
-                                <select class="form-select" id="modelSelector">
-                                    <option value="">Choose a model...</option>
-                                    {% for model in models %}
-                                        <option value="{{ model }}">{{ model.replace('_', ' ').title() }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="comparisonMode" class="form-label fw-bold">View Mode:</label>
-                                <select class="form-select" id="comparisonMode">
-                                    <option value="single">Single Model Analysis</option>
-                                    <option value="comparison">Compare All Models</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Export Options:</label>
-                                <div>
-                                    <button class="btn btn-outline-primary btn-sm me-2" id="exportPDF">
-                                        <i class="fas fa-file-pdf"></i> PDF
-                                    </button>
-                                    <button class="btn btn-outline-success btn-sm" id="exportExcel">
-                                        <i class="fas fa-file-excel"></i> Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+        </div>
+    </div>
 
-                        <!-- Loading Indicator -->
-                        <div id="loadingIndicator" class="text-center d-none">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2">Loading model performance data...</p>
-                        </div>
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading-indicator d-none">
+        <div class="loading-spinner"></div>
+        <p>Loading model performance data...</p>
+    </div>
 
-                        <!-- Performance Metrics Cards -->
-                        <div class="row mb-4" id="metricsCards">
-                            <div class="col-lg-3 col-md-6 mb-3">
-                                <div class="metric-card card bg-gradient-primary text-white">
-                                    <div class="card-body text-center">
-                                        <div class="metric-icon">
-                                            <i class="fas fa-chart-line fa-2x"></i>
-                                        </div>
-                                        <h5 class="card-title">ROC AUC</h5>
-                                        <h2 id="rocAucValue">-</h2>
-                                        <small>Area Under Curve</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 mb-3">
-                                <div class="metric-card card bg-gradient-success text-white">
-                                    <div class="card-body text-center">
-                                        <div class="metric-icon">
-                                            <i class="fas fa-bullseye fa-2x"></i>
-                                        </div>
-                                        <h5 class="card-title">Precision</h5>
-                                        <h2 id="precisionValue">-</h2>
-                                        <small>True Positive Rate</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 mb-3">
-                                <div class="metric-card card bg-gradient-warning text-white">
-                                    <div class="card-body text-center">
-                                        <div class="metric-icon">
-                                            <i class="fas fa-search fa-2x"></i>
-                                        </div>
-                                        <h5 class="card-title">Recall</h5>
-                                        <h2 id="recallValue">-</h2>
-                                        <small>Fraud Detection Rate</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 mb-3">
-                                <div class="metric-card card bg-gradient-info text-white">
-                                    <div class="card-body text-center">
-                                        <div class="metric-icon">
-                                            <i class="fas fa-balance-scale fa-2x"></i>
-                                        </div>
-                                        <h5 class="card-title">F1 Score</h5>
-                                        <h2 id="f1Value">-</h2>
-                                        <small>Harmonic Mean</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Performance Metrics Grid -->
+    <div class="metric-grid mb-8" id="metricsCards">
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i data-lucide="trending-up"></i>
+            </div>
+            <div class="metric-value" id="rocAucValue">-</div>
+            <div class="metric-label">ROC AUC</div>
+            <div class="metric-description">Area Under Curve</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i data-lucide="target"></i>
+            </div>
+            <div class="metric-value" id="precisionValue">-</div>
+            <div class="metric-label">Precision</div>
+            <div class="metric-description">True Positive Rate</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i data-lucide="search"></i>
+            </div>
+            <div class="metric-value" id="recallValue">-</div>
+            <div class="metric-label">Recall</div>
+            <div class="metric-description">Fraud Detection Rate</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i data-lucide="activity"></i>
+            </div>
+            <div class="metric-value" id="f1Value">-</div>
+            <div class="metric-label">F1 Score</div>
+            <div class="metric-description">Harmonic Mean</div>
+        </div>
+    </div>
 
-                        <!-- Visualization Charts Section -->
-                        <div class="row mb-4">
-                            <div class="col-lg-6">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Performance Comparison</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="performanceChart" width="400" height="200"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0"><i class="fas fa-chart-pie"></i> Model Distribution</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="distributionChart" width="400" height="200"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Feature Importance Section -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0"><i class="fas fa-chart-line"></i> Feature Importance Analysis</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-lg-8">
-                                                <canvas id="featureImportanceChart" width="600" height="300"></canvas>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="alert alert-info">
-                                                    <h6><i class="fas fa-info-circle"></i> Understanding Feature Importance</h6>
-                                                    <ul class="small mb-0">
-                                                        <li><strong>V1-V28:</strong> PCA-transformed features from original transaction data</li>
-                                                        <li><strong>Amount:</strong> Transaction monetary value</li>
-                                                        <li><strong>Time:</strong> Seconds elapsed since first transaction</li>
-                                                        <li>Higher values indicate stronger predictive power for fraud detection</li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Model Performance Summary Table -->
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0"><i class="fas fa-table"></i> Performance Summary</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover" id="performanceTable">
-                                                <thead class="table-dark">
-                                                    <tr>
-                                                        <th>Model</th>
-                                                        <th>ROC AUC</th>
-                                                        <th>Precision</th>
-                                                        <th>Recall</th>
-                                                        <th>F1 Score</th>
-                                                        <th>Accuracy</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for model_name, model_metrics in metrics.items() %}
-                                                        {% if model_metrics and 'error' not in model_metrics %}
-                                                            {% set fraud_metrics = model_metrics.classification_report.get('1', {}) %}
-                                                            <tr>
-                                                                <td><strong>{{ model_name.replace('_', ' ').title() }}</strong></td>
-                                                                <td>{{ "%.4f"|format(model_metrics.roc_auc_score) if model_metrics.roc_auc_score else 'N/A' }}</td>
-                                                                <td>{{ "%.4f"|format(fraud_metrics.precision) if fraud_metrics.precision else 'N/A' }}</td>
-                                                                <td>{{ "%.4f"|format(fraud_metrics.recall) if fraud_metrics.recall else 'N/A' }}</td>
-                                                                <td>{{ "%.4f"|format(fraud_metrics.get('f1-score', 0)) if fraud_metrics.get('f1-score') else 'N/A' }}</td>
-                                                                <td>{{ "%.4f"|format(model_metrics.classification_report.accuracy) if model_metrics.classification_report.accuracy else 'N/A' }}</td>
-                                                                <td><span class="badge bg-success">Active</span></td>
-                                                            </tr>
-                                                        {% else %}
-                                                            <tr>
-                                                                <td><strong>{{ model_name.replace('_', ' ').title() }}</strong></td>
-                                                                <td colspan="6" class="text-muted">{{ model_metrics.error if model_metrics else 'No data available' }}</td>
-                                                            </tr>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-warning text-center">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>No models found!</strong> Please train some models first.
-                            <br><br>
-                            <a href="#" class="btn btn-primary" onclick="trainModels()">
-                                <i class="fas fa-cogs"></i> Train Models Now
-                            </a>
-                        </div>
-                    {% endif %}
+    <!-- Visualization Charts Section -->
+    <div class="row mb-8">
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Performance Comparison</h3>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Model Distribution</h3>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="distributionChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Feature Importance Section -->
+    <div class="row mb-8">
+        <div class="col-12">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Feature Importance Analysis</h3>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="chart-canvas">
+                            <canvas id="featureImportanceChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="feature-info">
+                            <h4>Understanding Feature Importance</h4>
+                            <ul>
+                                <li><strong>V1-V28:</strong> PCA-transformed features from original transaction data</li>
+                                <li><strong>Amount:</strong> Transaction monetary value</li>
+                                <li><strong>Time:</strong> Seconds elapsed since first transaction</li>
+                                <li>Higher values indicate stronger predictive power for fraud detection</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Performance Summary Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Performance Summary</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-academic" id="performanceTable">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>ROC AUC</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1 Score</th>
+                                <th>Accuracy</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for model_name, model_metrics in metrics.items() %}
+                                {% if model_metrics and 'error' not in model_metrics %}
+                                    {% set fraud_metrics = model_metrics.classification_report.get('1', {}) %}
+                                    <tr>
+                                        <td><strong>{{ model_name.replace('_', ' ').title() }}</strong></td>
+                                        <td>{{ "%.4f"|format(model_metrics.roc_auc_score) if model_metrics.roc_auc_score else 'N/A' }}</td>
+                                        <td>{{ "%.4f"|format(fraud_metrics.precision) if fraud_metrics.precision else 'N/A' }}</td>
+                                        <td>{{ "%.4f"|format(fraud_metrics.recall) if fraud_metrics.recall else 'N/A' }}</td>
+                                        <td>{{ "%.4f"|format(fraud_metrics.get('f1-score', 0)) if fraud_metrics.get('f1-score') else 'N/A' }}</td>
+                                        <td>{{ "%.4f"|format(model_metrics.classification_report.accuracy) if model_metrics.classification_report.accuracy else 'N/A' }}</td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td><strong>{{ model_name.replace('_', ' ').title() }}</strong></td>
+                                        <td colspan="6" class="text-muted">{{ model_metrics.error if model_metrics else 'No data available' }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- No Models State -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i data-lucide="database"></i>
+        </div>
+        <h3>No Models Available</h3>
+        <p>Please train some models first to view performance metrics.</p>
+        <button class="btn btn-primary" onclick="trainModels()">
+            <i data-lucide="play"></i> Train Models Now
+        </button>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
 {% block scripts %}
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Professional Charts -->
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
 <script>
 // Initialize dashboard with available models and metrics (FIXED: tojson instead of tojsonfilter)
 const availableModels = {{ models | tojson if models else '[]' }};
@@ -304,164 +293,30 @@ function trainModels() {
     alert('Please run the training script:\npython main.py');
 }
 
-// Initialize Charts
+// Professional Charts Instance
+let performanceChart = null;
+let distributionChart = null;
+let featureImportanceChart = null;
+
+// Initialize Professional Charts
 function initializeCharts() {
-    if (typeof Chart === 'undefined') {
-        console.error('Chart.js not loaded');
+    if (typeof Chart === 'undefined' || !window.ProfessionalCharts) {
+        console.error('Chart.js or ProfessionalCharts not loaded');
         return;
     }
 
     // Performance Comparison Chart
-    const perfCtx = document.getElementById('performanceChart');
-    if (perfCtx && initialMetrics && Object.keys(initialMetrics).length > 0) {
-        const models = Object.keys(initialMetrics);
-        const rocAucScores = models.map(model => {
-            const metrics = initialMetrics[model];
-            return metrics && metrics.roc_auc_score ? metrics.roc_auc_score : 0;
-        });
-        const precisionScores = models.map(model => {
-            const metrics = initialMetrics[model];
-            return metrics && metrics.classification_report && metrics.classification_report['1'] 
-                ? metrics.classification_report['1'].precision || 0 : 0;
-        });
-        const recallScores = models.map(model => {
-            const metrics = initialMetrics[model];
-            return metrics && metrics.classification_report && metrics.classification_report['1'] 
-                ? metrics.classification_report['1'].recall || 0 : 0;
-        });
-
-        new Chart(perfCtx, {
-            type: 'bar',
-            data: {
-                labels: models.map(m => m.replace('_', ' ').toUpperCase()),
-                datasets: [
-                    {
-                        label: 'ROC AUC',
-                        data: rocAucScores,
-                        backgroundColor: 'rgba(30, 58, 138, 0.8)',
-                        borderColor: 'rgba(30, 58, 138, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Precision',
-                        data: precisionScores,
-                        backgroundColor: 'rgba(6, 95, 70, 0.8)',
-                        borderColor: 'rgba(6, 95, 70, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Recall',
-                        data: recallScores,
-                        backgroundColor: 'rgba(217, 119, 6, 0.8)',
-                        borderColor: 'rgba(217, 119, 6, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 1.0
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Model Performance Comparison'
-                    }
-                }
-            }
-        });
+    if (initialMetrics && Object.keys(initialMetrics).length > 0) {
+        performanceChart = window.ProfessionalCharts.createPerformanceChart('performanceChart', initialMetrics);
     }
 
     // Distribution Chart
-    const distCtx = document.getElementById('distributionChart');
-    if (distCtx && initialMetrics && Object.keys(initialMetrics).length > 0) {
-        const models = Object.keys(initialMetrics);
-        const f1Scores = models.map(model => {
-            const metrics = initialMetrics[model];
-            return metrics && metrics.classification_report && metrics.classification_report['1'] 
-                ? metrics.classification_report['1']['f1-score'] || 0 : 0;
-        });
-
-        new Chart(distCtx, {
-            type: 'doughnut',
-            data: {
-                labels: models.map(m => m.replace('_', ' ').toUpperCase()),
-                datasets: [{
-                    data: f1Scores,
-                    backgroundColor: [
-                        'rgba(30, 58, 138, 0.8)',
-                        'rgba(6, 95, 70, 0.8)',
-                        'rgba(217, 119, 6, 0.8)',
-                        'rgba(153, 27, 27, 0.8)',
-                        'rgba(71, 85, 105, 0.8)',
-                        'rgba(180, 83, 9, 0.8)'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    title: {
-                        display: true,
-                        text: 'F1 Score Distribution'
-                    }
-                }
-            }
-        });
+    if (initialMetrics && Object.keys(initialMetrics).length > 0) {
+        distributionChart = window.ProfessionalCharts.createDistributionChart('distributionChart', initialMetrics);
     }
 
-    // Feature Importance Chart (simplified)
-    const featCtx = document.getElementById('featureImportanceChart');
-    if (featCtx) {
-        // Sample feature importance data (would normally come from SHAP analysis)
-        const sampleFeatures = ['Amount', 'V14', 'V12', 'V10', 'V16', 'V3', 'V7', 'V1', 'Time', 'V4'];
-        const sampleImportance = [0.15, 0.12, 0.11, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03];
-
-        new Chart(featCtx, {
-            type: 'horizontalBar',
-            data: {
-                labels: sampleFeatures,
-                datasets: [{
-                    label: 'Feature Importance',
-                    data: sampleImportance,
-                    backgroundColor: 'rgba(30, 58, 138, 0.8)',
-                    borderColor: 'rgba(30, 58, 138, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                indexAxis: 'y',
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        max: 0.2
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Global Feature Importance (Sample Data)'
-                    }
-                }
-            }
-        });
-    }
+    // Feature Importance Chart
+    featureImportanceChart = window.ProfessionalCharts.createFeatureImportanceChart('featureImportanceChart');
 }
 
 // Call initialize charts when DOM is ready
@@ -474,6 +329,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(initializeCharts, 500);
     
     // Rest of existing code...
+    // Initialize Lucide icons
+    lucide.createIcons();
+    
     document.getElementById('refreshDashboard')?.addEventListener('click', function() {
         window.location.reload();
     });

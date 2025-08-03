@@ -1,0 +1,443 @@
+{% extends "base.html" %}
+
+{% block title %}ML Monitoring Dashboard - FraudGuard AI{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+/* ML Monitoring Specific Styles */
+.ml-monitoring-header {
+    background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);
+    color: white;
+    padding: var(--space-8) 0;
+    margin-bottom: var(--space-8);
+}
+
+.ml-monitoring-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+}
+
+.ml-monitoring-subtitle {
+    font-size: var(--text-lg);
+    opacity: 0.9;
+}
+
+.model-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.model-status-card {
+    background: white;
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-none);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6);
+    transition: all var(--transition-normal) var(--transition-curve);
+}
+
+.model-status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.model-status-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.model-name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+}
+
+.health-indicator {
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.health-excellent { background: var(--color-success-100); color: var(--color-success-700); }
+.health-good { background: var(--color-success-100); color: var(--color-success-600); }
+.health-fair { background: var(--color-warning-100); color: var(--color-warning-700); }
+.health-unhealthy { background: var(--color-danger-100); color: var(--color-danger-700); }
+
+.model-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.metric-item {
+    text-align: center;
+}
+
+.metric-value {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-neutral-800);
+    margin-bottom: var(--space-1);
+}
+
+.metric-label {
+    font-size: var(--text-xs);
+    color: var(--color-neutral-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.model-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+}
+
+.btn-sm {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+}
+
+.alert-panel {
+    background: var(--color-danger-50);
+    border: 1px solid var(--color-danger-200);
+    border-left: 4px solid var(--color-danger-500);
+    border-radius: var(--radius-none);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.alert-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-danger-700);
+    margin-bottom: var(--space-2);
+}
+
+.alert-message {
+    font-size: var(--text-sm);
+    color: var(--color-danger-600);
+}
+
+.performance-trend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+
+.trend-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.trend-improving { color: var(--color-success-600); }
+.trend-stable { color: var(--color-neutral-500); }
+.trend-degrading { color: var(--color-danger-600); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ml-monitoring-header">
+    <div class="container">
+        <h1 class="ml-monitoring-title">ML Model Monitoring</h1>
+        <p class="ml-monitoring-subtitle">Real-time performance monitoring and management</p>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!-- Summary Stats -->
+    <div class="metric-grid mb-8">
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i data-lucide="database"></i>
+            </div>
+            <div class="metric-value">{{ total_models }}</div>
+            <div class="metric-label">Total Models</div>
+            <div class="metric-description">Registered in system</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i data-lucide="activity"></i>
+            </div>
+            <div class="metric-value" id="activeModels">{{ models|selectattr('deployment_stage', 'equalto', 'production')|list|length }}</div>
+            <div class="metric-label">Active Models</div>
+            <div class="metric-description">In production</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i data-lucide="trending-up"></i>
+            </div>
+            <div class="metric-value" id="healthyModels">{{ models|selectattr('health_status', 'in', ['excellent', 'good'])|list|length }}</div>
+            <div class="metric-label">Healthy Models</div>
+            <div class="metric-description">Performing well</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <i data-lucide="alert-triangle"></i>
+            </div>
+            <div class="metric-value" id="alertCount">{{ models|selectattr('health_status', 'equalto', 'unhealthy')|list|length }}</div>
+            <div class="metric-label">Alerts</div>
+            <div class="metric-description">Require attention</div>
+        </div>
+    </div>
+
+    <!-- Alerts Section -->
+    <div id="alertsSection" class="mb-6" style="display: none;">
+        <div class="alert-panel">
+            <div class="alert-title">
+                <i data-lucide="alert-circle"></i> Performance Alerts
+            </div>
+            <div class="alert-message" id="alertMessage">
+                Some models are experiencing performance issues and may require attention.
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Status Cards -->
+    <div class="model-status-grid">
+        {% for model in models %}
+        <div class="model-status-card" data-model-id="{{ model.model_id }}">
+            <div class="model-status-header">
+                <div class="model-name">{{ model.name or 'Unnamed Model' }}</div>
+                <div class="health-indicator health-{{ model.health_status or 'unknown' }}">
+                    {{ model.health_status or 'Unknown' }}
+                </div>
+            </div>
+            
+            <div class="model-info mb-4">
+                <div class="text-sm text-neutral-600 mb-2">
+                    <strong>Algorithm:</strong> {{ model.algorithm or 'Unknown' }}
+                </div>
+                <div class="text-sm text-neutral-600 mb-2">
+                    <strong>Version:</strong> {{ model.active_version or 'N/A' }}
+                </div>
+                <div class="text-sm text-neutral-600">
+                    <strong>Stage:</strong> {{ model.deployment_stage or 'Development' }}
+                </div>
+            </div>
+
+            {% if model.latest_performance %}
+            <div class="model-metrics">
+                <div class="metric-item">
+                    <div class="metric-value">{{ "%.3f"|format(model.latest_performance.accuracy) }}</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">{{ "%.3f"|format(model.latest_performance.f1_score) }}</div>
+                    <div class="metric-label">F1 Score</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">{{ "%.1f"|format(model.latest_performance.prediction_latency) }}ms</div>
+                    <div class="metric-label">Latency</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">{{ "%.3f"|format(model.latest_performance.drift_score) }}</div>
+                    <div class="metric-label">Drift Score</div>
+                </div>
+            </div>
+
+            <div class="performance-trend">
+                {% if model.performance_trend == 'improving' %}
+                    <i data-lucide="trending-up" class="trend-icon trend-improving"></i>
+                    <span class="text-sm trend-improving">Improving</span>
+                {% elif model.performance_trend == 'degrading' %}
+                    <i data-lucide="trending-down" class="trend-icon trend-degrading"></i>
+                    <span class="text-sm trend-degrading">Degrading</span>
+                {% else %}
+                    <i data-lucide="minus" class="trend-icon trend-stable"></i>
+                    <span class="text-sm trend-stable">Stable</span>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-center text-neutral-500 py-4">
+                <i data-lucide="bar-chart-3" class="mb-2"></i>
+                <div class="text-sm">No performance data available</div>
+            </div>
+            {% endif %}
+
+            <div class="model-actions">
+                <button class="btn btn-outline-primary btn-sm" onclick="viewModelDetails('{{ model.model_id }}')">
+                    <i data-lucide="eye"></i> Details
+                </button>
+                {% if model.deployment_stage != 'production' %}
+                <button class="btn btn-outline-success btn-sm" onclick="deployModel('{{ model.model_id }}')">
+                    <i data-lucide="upload"></i> Deploy
+                </button>
+                {% endif %}
+                <button class="btn btn-outline-warning btn-sm" onclick="retrainModel('{{ model.model_id }}')">
+                    <i data-lucide="refresh-cw"></i> Retrain
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not models %}
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i data-lucide="database"></i>
+        </div>
+        <h3>No Models Registered</h3>
+        <p>No ML models have been registered in the system yet. Train and register models to start monitoring their performance.</p>
+        <button class="btn btn-primary" onclick="window.location.href='/dashboard'">
+            <i data-lucide="plus"></i> Go to Dashboard
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Model Details Modal -->
+<div class="modal fade" id="modelDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Model Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modelDetailsContent">
+                <div class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <p>Loading model details...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize Lucide icons
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    // Check for alerts
+    const unhealthyModels = {{ models|selectattr('health_status', 'equalto', 'unhealthy')|list|length }};
+    if (unhealthyModels > 0) {
+        document.getElementById('alertsSection').style.display = 'block';
+    }
+    
+    // Auto-refresh every 30 seconds
+    setInterval(refreshDashboard, 30000);
+});
+
+function viewModelDetails(modelId) {
+    const modal = new bootstrap.Modal(document.getElementById('modelDetailsModal'));
+    const content = document.getElementById('modelDetailsContent');
+    
+    // Show loading
+    content.innerHTML = `
+        <div class="loading-indicator">
+            <div class="loading-spinner"></div>
+            <p>Loading model details...</p>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // Fetch model details
+    fetch(`/mlops/models/${modelId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                content.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                return;
+            }
+            
+            content.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Model Information</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Name:</strong></td><td>${data.name || 'N/A'}</td></tr>
+                            <tr><td><strong>Algorithm:</strong></td><td>${data.algorithm || 'N/A'}</td></tr>
+                            <tr><td><strong>Created:</strong></td><td>${new Date(data.created_at).toLocaleString()}</td></tr>
+                            <tr><td><strong>Status:</strong></td><td>${data.deployment_status || 'N/A'}</td></tr>
+                            <tr><td><strong>Stage:</strong></td><td>${data.deployment_stage || 'N/A'}</td></tr>
+                            <tr><td><strong>Health:</strong></td><td>${data.health_status || 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Performance Metrics</h6>
+                        ${data.latest_performance ? `
+                            <table class="table table-sm">
+                                <tr><td><strong>Accuracy:</strong></td><td>${data.latest_performance.accuracy.toFixed(4)}</td></tr>
+                                <tr><td><strong>Precision:</strong></td><td>${data.latest_performance.precision.toFixed(4)}</td></tr>
+                                <tr><td><strong>Recall:</strong></td><td>${data.latest_performance.recall.toFixed(4)}</td></tr>
+                                <tr><td><strong>F1 Score:</strong></td><td>${data.latest_performance.f1_score.toFixed(4)}</td></tr>
+                                <tr><td><strong>AUC-ROC:</strong></td><td>${data.latest_performance.auc_roc.toFixed(4)}</td></tr>
+                                <tr><td><strong>Drift Score:</strong></td><td>${data.latest_performance.drift_score.toFixed(4)}</td></tr>
+                            </table>
+                        ` : '<p class="text-muted">No performance data available</p>'}
+                    </div>
+                </div>
+            `;
+        })
+        .catch(error => {
+            content.innerHTML = `<div class="alert alert-danger">Failed to load model details: ${error.message}</div>`;
+        });
+}
+
+function deployModel(modelId) {
+    if (!confirm('Deploy this model to production?')) return;
+    
+    fetch(`/mlops/models/${modelId}/deploy`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ stage: 'production' })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Deployment failed: ' + data.error);
+        } else {
+            alert('Model deployed successfully!');
+            refreshDashboard();
+        }
+    })
+    .catch(error => {
+        alert('Deployment failed: ' + error.message);
+    });
+}
+
+function retrainModel(modelId) {
+    if (!confirm('Trigger retraining for this model?')) return;
+    
+    fetch(`/mlops/models/${modelId}/retrain`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reason: 'Manual retraining request from dashboard' })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Retraining failed: ' + data.error);
+        } else {
+            alert('Retraining triggered successfully! Job ID: ' + data.job_id);
+        }
+    })
+    .catch(error => {
+        alert('Retraining failed: ' + error.message);
+    });
+}
+
+function refreshDashboard() {
+    window.location.reload();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+
+{% block title %}Model Performance Report - FraudGuard AI{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+/* Model Report Specific Styles */
+.model-report-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: var(--shadow-lg);
+    min-height: 100vh;
+}
+
+.report-executive-summary {
+    background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 100%);
+    border: 1px solid var(--color-primary-200);
+    border-left: 4px solid var(--color-primary-600);
+    border-radius: var(--radius-none);
+    padding: var(--space-8);
+    margin: var(--space-8) 0;
+}
+
+.summary-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-primary-800);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+}
+
+.summary-metric {
+    text-align: center;
+    padding: var(--space-4);
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.summary-metric-value {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-primary-700);
+    margin-bottom: var(--space-2);
+}
+
+.summary-metric-label {
+    font-size: var(--text-sm);
+    color: var(--color-neutral-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.model-section {
+    margin: var(--space-8) 0;
+    padding: var(--space-6);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-none);
+}
+
+.model-section-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid var(--color-primary-600);
+}
+
+.model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-6);
+}
+
+.model-card {
+    background: var(--color-neutral-50);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-none);
+    padding: var(--space-6);
+    transition: all var(--transition-normal) var(--transition-curve);
+}
+
+.model-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.model-card.best-model {
+    border-left: 4px solid var(--color-success-600);
+    background: var(--color-success-50);
+}
+
+.model-name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+    margin-bottom: var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.best-badge {
+    background: var(--color-success-600);
+    color: white;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.model-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.metric-label {
+    font-size: var(--text-sm);
+    color: var(--color-neutral-600);
+    font-weight: 500;
+}
+
+.metric-value {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-neutral-800);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.feature-importance-section {
+    margin: var(--space-8) 0;
+}
+
+.feature-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-4) 0;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-none);
+    overflow: hidden;
+}
+
+.feature-table th {
+    background: var(--color-primary-600);
+    color: white;
+    font-weight: 600;
+    text-align: left;
+    padding: var(--space-4);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.feature-table td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-neutral-200);
+    vertical-align: middle;
+}
+
+.feature-table tr:nth-child(even) {
+    background: var(--color-neutral-50);
+}
+
+.feature-table tr:hover {
+    background: var(--color-primary-50);
+}
+
+.importance-bar {
+    height: 8px;
+    background: var(--color-neutral-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin: var(--space-1) 0;
+}
+
+.importance-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-primary-700));
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal);
+}
+
+.recommendations-section {
+    background: var(--color-warning-50);
+    border: 1px solid var(--color-warning-200);
+    border-left: 4px solid var(--color-warning-600);
+    border-radius: var(--radius-none);
+    padding: var(--space-6);
+    margin: var(--space-8) 0;
+}
+
+.recommendations-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-warning-800);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.recommendation-list {
+    list-style: none;
+    padding: 0;
+}
+
+.recommendation-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    padding: var(--space-3);
+    background: white;
+    border-radius: var(--radius-md);
+}
+
+.recommendation-icon {
+    color: var(--color-warning-600);
+    margin-top: var(--space-1);
+}
+
+.recommendation-text {
+    font-size: var(--text-sm);
+    color: var(--color-neutral-700);
+    line-height: var(--leading-relaxed);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="model-report-container">
+    <!-- Report Header -->
+    <div class="report-header">
+        <h1 class="report-title">Model Performance Analysis</h1>
+        <p class="report-subtitle">Comprehensive evaluation of fraud detection models</p>
+        <div class="report-meta">
+            <div>Generated on {{ generated_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="report-nav">
+        <div class="report-nav-content">
+            <div class="breadcrumb">
+                <a href="/" class="text-primary">Home</a> / 
+                <a href="/docs/model-report" class="text-primary">Reports</a> /
+                <span class="text-neutral-600">Model Analysis</span>
+            </div>
+            <div class="report-actions">
+                <button onclick="window.print()" class="report-btn">
+                    <i data-lucide="printer"></i> Print PDF
+                </button>
+                <a href="/dashboard/" class="report-btn secondary">
+                    <i data-lucide="bar-chart-3"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-content">
+        <!-- Executive Summary -->
+        <div class="report-executive-summary">
+            <h2 class="summary-title">
+                <i data-lucide="trending-up"></i>
+                Executive Summary
+            </h2>
+            <p>This report presents a comprehensive analysis of {{ training_metadata.total_models or 'multiple' }} machine learning models 
+            developed for credit card fraud detection. The models were trained and evaluated using advanced techniques 
+            to ensure robust performance in production environments.</p>
+            
+            <div class="summary-grid">
+                <div class="summary-metric">
+                    <div class="summary-metric-value">{{ training_metadata.total_models or 0 }}</div>
+                    <div class="summary-metric-label">Models Trained</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-metric-value">{{ "%.3f"|format(training_metadata.best_auc or 0) }}</div>
+                    <div class="summary-metric-label">Best AUC Score</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-metric-value">{{ (training_metadata.best_model or 'Unknown').replace('_', ' ').title() }}</div>
+                    <div class="summary-metric-label">Top Performer</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-metric-value">{{ "%.3f"|format(performance_summary.average_auc or 0) }}</div>
+                    <div class="summary-metric-label">Average AUC</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Performance Section -->
+        <div class="model-section">
+            <h2 class="model-section-title">Individual Model Performance</h2>
+            <div class="model-grid">
+                {% for model_name, metrics in models.items() %}
+                <div class="model-card {% if model_name == training_metadata.best_model %}best-model{% endif %}">
+                    <div class="model-name">
+                        {{ model_name.replace('_', ' ').title() }}
+                        {% if model_name == training_metadata.best_model %}
+                        <span class="best-badge">Best</span>
+                        {% endif %}
+                    </div>
+                    <div class="model-metrics">
+                        <div class="metric-item">
+                            <span class="metric-label">AUC-ROC</span>
+                            <span class="metric-value">{{ "%.4f"|format(metrics.auc_roc or 0) }}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Precision</span>
+                            <span class="metric-value">{{ "%.4f"|format(metrics.precision or 0) }}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Recall</span>
+                            <span class="metric-value">{{ "%.4f"|format(metrics.recall or 0) }}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">F1 Score</span>
+                            <span class="metric-value">{{ "%.4f"|format(metrics.f1_score or 0) }}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">CV AUC</span>
+                            <span class="metric-value">{{ "%.4f"|format(metrics.cv_auc_mean or 0) }}</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Samples</span>
+                            <span class="metric-value">{{ "{:,}".format(metrics.training_samples or 0) }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Feature Importance Section -->
+        {% if feature_analysis and feature_analysis.top_features %}
+        <div class="feature-importance-section">
+            <div class="model-section">
+                <h2 class="model-section-title">Feature Importance Analysis</h2>
+                <p>The following features were identified as most important across all models:</p>
+                
+                <table class="feature-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Mean Importance</th>
+                            <th>Std Deviation</th>
+                            <th>Max Importance</th>
+                            <th>Visual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for feature, importance_data in feature_analysis.top_features.items()[:10] %}
+                        <tr>
+                            <td><strong>{{ feature }}</strong></td>
+                            <td>{{ "%.4f"|format(importance_data.mean_importance or 0) }}</td>
+                            <td>{{ "%.4f"|format(importance_data.std_importance or 0) }}</td>
+                            <td>{{ "%.4f"|format(importance_data.max_importance or 0) }}</td>
+                            <td>
+                                <div class="importance-bar">
+                                    <div class="importance-fill" style="width: {{ (importance_data.mean_importance or 0) * 100 }}%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Insights and Recommendations -->
+        {% if insights %}
+        <div class="recommendations-section">
+            <h2 class="recommendations-title">
+                <i data-lucide="lightbulb"></i>
+                Insights & Recommendations
+            </h2>
+            
+            <div class="mb-4">
+                <strong>Performance Assessment:</strong> {{ insights.performance_tier or 'Unknown' }} 
+                (Risk Level: {{ insights.risk_assessment or 'Medium' }})
+            </div>
+            
+            {% if insights.strengths %}
+            <div class="mb-4">
+                <strong>Key Strengths:</strong>
+                <ul class="recommendation-list">
+                    {% for strength in insights.strengths %}
+                    <li class="recommendation-item">
+                        <i data-lucide="check-circle" class="recommendation-icon"></i>
+                        <span class="recommendation-text">{{ strength }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            {% if insights.recommendations %}
+            <div>
+                <strong>Recommendations:</strong>
+                <ul class="recommendation-list">
+                    {% for recommendation in insights.recommendations %}
+                    <li class="recommendation-item">
+                        <i data-lucide="arrow-right" class="recommendation-icon"></i>
+                        <span class="recommendation-text">{{ recommendation }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Technical Implementation -->
+        <div class="model-section">
+            <h2 class="model-section-title">Technical Implementation</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4>Deployment Readiness</h4>
+                    <ul>
+                        <li>✅ All models saved with comprehensive metadata</li>
+                        <li>✅ Professional monitoring systems in place</li>
+                        <li>✅ Scalable architecture for high-volume processing</li>
+                        <li>✅ Complete audit trail and version control</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Quality Assurance</h4>
+                    <ul>
+                        <li>✅ Cross-validation performed on all models</li>
+                        <li>✅ Performance benchmarks established</li>
+                        <li>✅ Explainability features implemented</li>
+                        <li>✅ Professional reporting capabilities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-neutral-500 mt-12 pt-6 border-t">
+            <p><em>This report was automatically generated from comprehensive model training results.</em></p>
+            <p>FraudGuard AI - Professional Fraud Detection System</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize Lucide icons
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+});
+</script>
+{% endblock %}

@@ -16,15 +16,22 @@ class DataIngestion:
         self.config = config
         
     def initiate_data_ingestion(self):
-        """Load and split the dataset"""
+        """Load and split the real creditcard dataset"""
         try:
             fraud_logger.info("Starting data ingestion...")
             
-            # Create improved synthetic data
-            df = self._create_improved_synthetic_data()
+            # Load the real creditcard dataset
+            data_path = "data/creditcard.csv"
+            if not os.path.exists(data_path):
+                raise FraudGuardException(f"Dataset not found at {data_path}")
             
-            fraud_logger.info(f"Dataset shape: {df.shape}")
-            fraud_logger.info(f"Fraud ratio: {df['Class'].mean():.4f}")
+            fraud_logger.info(f"Loading dataset from {data_path}")
+            df = pd.read_csv(data_path)
+            
+            fraud_logger.info(f"Dataset loaded successfully:")
+            fraud_logger.info(f"  Shape: {df.shape}")
+            fraud_logger.info(f"  Fraud cases: {df['Class'].sum()} ({df['Class'].mean():.4f})")
+            fraud_logger.info(f"  Features: {list(df.columns)}")
             
             # Split the data
             train_set, test_set = train_test_split(
@@ -40,6 +47,8 @@ class DataIngestion:
             test_set.to_csv(RAW_DATA_DIR / "test.csv", index=False)
             
             fraud_logger.info("Data ingestion completed successfully")
+            fraud_logger.info(f"  Train set: {train_set.shape}")
+            fraud_logger.info(f"  Test set: {test_set.shape}")
             
             return (
                 str(RAW_DATA_DIR / "train.csv"),

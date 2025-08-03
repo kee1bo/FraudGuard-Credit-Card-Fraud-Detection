@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Error - FraudGuard AI{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+    <div class="max-w-2xl mx-auto text-center">
+        <div class="mb-8">
+            <i data-lucide="alert-triangle" class="w-16 h-16 mx-auto text-danger-500 mb-4"></i>
+            <h1 class="text-3xl font-bold text-neutral-900 mb-4">Oops! Something went wrong</h1>
+            <p class="text-lg text-neutral-600">{{ error_message or "An unexpected error occurred." }}</p>
+        </div>
+        
+        <div class="bg-neutral-50 border border-neutral-200 rounded-none p-6 mb-8">
+            <h3 class="font-semibold text-neutral-800 mb-2">What you can do:</h3>
+            <ul class="text-left text-neutral-600 space-y-2">
+                <li>• Go back to the <a href="/" class="text-primary-600 hover:text-primary-800">home page</a></li>
+                <li>• Try the <a href="/predict/" class="text-primary-600 hover:text-primary-800">fraud detection</a> feature</li>
+                <li>• Check the <a href="/dashboard/" class="text-primary-600 hover:text-primary-800">dashboard</a></li>
+                <li>• Contact support if the problem persists</li>
+            </ul>
+        </div>
+        
+        <div class="flex gap-4 justify-center">
+            <a href="/" class="btn btn-primary">
+                <i data-lucide="home"></i> Go Home
+            </a>
+            <button onclick="history.back()" class="btn btn-secondary">
+                <i data-lucide="arrow-left"></i> Go Back
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+});
+</script>
+{% endblock %}

@@ -7,18 +7,9 @@ src_path = Path(__file__).parent.parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
 from flask import Blueprint, render_template, request, jsonify
-from fraudguard.pipeline.prediction_pipeline import PredictionPipeline
+from fraudguard.pipeline.pipeline_manager import pipeline_manager
 
 dashboard_bp = Blueprint('dashboard', __name__)
-
-# Initialize prediction pipeline for metrics
-try:
-    prediction_pipeline = PredictionPipeline()
-    available_models = prediction_pipeline.get_available_models()
-except Exception as e:
-    print(f"Warning: Could not initialize prediction pipeline: {e}")
-    prediction_pipeline = None
-    available_models = []
 
 def load_model_metrics():
     """Load model metrics from the comparison report"""
@@ -37,12 +28,13 @@ def dashboard():
     """Model performance dashboard"""
     # Get metrics from the comparison report
     all_metrics = load_model_metrics()
+    available_models = pipeline_manager.get_available_models()
     
     # If we have models from pipeline but no metrics, create empty entries
     if available_models and not all_metrics:
         all_metrics = {model: {"error": "Metrics not available"} for model in available_models}
     
-    return render_template('dashboard-redesigned.html', 
+    return render_template('dashboard.html', 
                          models=available_models,
                          metrics=all_metrics)
 
@@ -51,6 +43,7 @@ def comparison():
     """Model comparison page"""
     # Load metrics from the comparison report
     all_metrics = load_model_metrics()
+    available_models = pipeline_manager.get_available_models()
     
     # Use models from metrics if pipeline models are empty
     models_to_use = list(all_metrics.keys()) if all_metrics else available_models

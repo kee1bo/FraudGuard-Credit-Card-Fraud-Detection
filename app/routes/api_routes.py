@@ -6,16 +6,9 @@ src_path = Path(__file__).parent.parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
 from flask import Blueprint, request, jsonify
-from fraudguard.pipeline.prediction_pipeline import PredictionPipeline
+from fraudguard.pipeline.pipeline_manager import pipeline_manager
 
 api_bp = Blueprint('api', __name__)
-
-# Initialize prediction pipeline
-try:
-    prediction_pipeline = PredictionPipeline()
-except Exception as e:
-    print(f"Warning: Could not initialize prediction pipeline: {e}")
-    prediction_pipeline = None
 
 @api_bp.route('/models')
 def get_available_models():

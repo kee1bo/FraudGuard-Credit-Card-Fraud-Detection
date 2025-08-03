@@ -1,0 +1,12 @@
+{
+  "average_auc": 0.6966081006261343,
+  "best_auc": 0.7198620751574956,
+  "model_count": 5,
+  "fraud_detection_rates": {
+    "logistic_regression": 0.5531914893617021,
+    "random_forest": 0.0,
+    "xgboost": 0.0,
+    "lightgbm": 0.0,
+    "catboost": 0.0
+  }
+}
