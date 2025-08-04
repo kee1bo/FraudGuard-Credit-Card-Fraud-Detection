@@ -43,13 +43,11 @@ Thumbs.db
 logs/
 *.log
 
-# Artifacts
-artifacts/models/*.pkl
-artifacts/preprocessors/*.pkl
-artifacts/explainers/*.pkl
+# Artifacts - Complete folder exclusion
+artifacts/
 temp/
 
-# Data
+# Data - Complete folder exclusion
 data/
 *.csv
 *.parquet
